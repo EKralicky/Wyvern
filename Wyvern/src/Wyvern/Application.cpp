@@ -81,11 +81,15 @@ void Application::initVulkan()
 	}
 	checkGLFWSupportedExtensions(extensions);
 
-	VkDebugUtilsMessengerCreateInfoEXT debugMessengerInfo;
-	WYVK::createDebugMessengerInfo(debugMessengerInfo);
-	WYVK::createInstance(m_instance, debugMessengerInfo);
-	WYVK::initDebugMessenger(m_instance, debugMessengerInfo, m_debugMessenger);
-	WYVK::pickPhysicalDevice(m_instance, m_physicalDevice);
+	m_renderer.init();
+
+	//VkDebugUtilsMessengerCreateInfoEXT debugMessengerInfo;
+	//WYVK::createDebugMessengerInfo(debugMessengerInfo);
+	//WYVK::createInstance(m_instance, debugMessengerInfo);
+	//WYVK::initDebugMessenger(m_instance, debugMessengerInfo, m_debugMessenger);
+	//WYVK::pickPhysicalDevice(m_instance, m_physicalDevice);
+	//WYVK::createLogicalDevice(m_instance, m_physicalDevice, m_device);
+	//vkGetDeviceQueue(m_device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 }
 
 void Application::mainLoop()
@@ -97,13 +101,9 @@ void Application::mainLoop()
 
 void Application::cleanup()
 {
-	if (enableValidationLayers) {
-		WYVK::destroyDebugMessengerEXT(m_instance, m_debugMessenger, nullptr);
-	}
-	vkDestroyInstance(m_instance, nullptr);
+	m_renderer.destroy();
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
 }
-
 
 }

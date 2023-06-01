@@ -15,16 +15,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Wyvern\Application.cpp">
+    <ClCompile Include="src\Wyvern\application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Wyvern\Log.cpp">
+    <ClCompile Include="src\Wyvern\log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Wyvern.cpp">
+    <ClCompile Include="src\wyvern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\vk_utility\WYVK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\CreateInfo\info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,13 +47,34 @@
     <ClInclude Include="src\vk_utility\WYVK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Wyvern\Application.h">
+    <ClInclude Include="src\Wyvern\application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Wyvern\Core.h">
+    <ClInclude Include="src\Wyvern\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Wyvern\Log.h">
+    <ClInclude Include="src\Wyvern\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_swapchain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_surface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\CreateInfo\info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
