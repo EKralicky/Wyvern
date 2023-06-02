@@ -42,6 +42,9 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\CreateInfo\info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_surface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\vk_utility\WYVK.h">

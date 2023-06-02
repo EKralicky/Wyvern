@@ -11,7 +11,7 @@ namespace Wyvern {
 class WYVKRenderer
 {
 public:
-    void init();
+    void init(GLFWwindow* window);
     void destroy();
 
 private:
@@ -24,6 +24,9 @@ private:
     VkQueue m_graphicsQueue;
     WYVKDevice m_device;
     WYVKMessenger m_debugMessenger;
+    WYVKSurface m_surface;
+
+    GLFWwindow* m_window; // pointer to GLFW window
 
     std::vector<const char*> m_validationLayers;
     std::vector<const char*> m_enabledExtensions;

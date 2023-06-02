@@ -81,7 +81,7 @@ void Application::initVulkan()
 	}
 	checkGLFWSupportedExtensions(extensions);
 
-	m_renderer.init();
+	m_renderer.init(m_window);
 
 	//VkDebugUtilsMessengerCreateInfoEXT debugMessengerInfo;
 	//WYVK::createDebugMessengerInfo(debugMessengerInfo);

@@ -1,11 +1,13 @@
 #include <map>
+#include <set>
 
 #include "wyvk_device.h"
 
 namespace Wyvern {
 
-    void WYVKDevice::initialize(VkInstance instance, std::vector<const char*>& validationLayers)
+void WYVKDevice::initialize(VkInstance instance, std::vector<const char*>& validationLayers, VkSurfaceKHR surface)
 {
+    m_surface = surface;
     std::vector<VkPhysicalDevice> devices = queryPhysicalDevices(instance);
     std::multimap<int, VkPhysicalDevice> candidates;
 
@@ -28,6 +30,15 @@ namespace Wyvern {
     WYVERN_ASSERT(isDeviceSuitable(m_physicalDevice), "The chosen physical device is not suitable for graphics rendering!!!");
     WYVERN_LOG_INFO("Chosen device: {} {} {}", deviceProperties.deviceName, deviceProperties.deviceID, deviceProperties.driverVersion);
     createLogicalDevice(instance, validationLayers);
+}
+
+/*
+* Destroys the logical device. The physical device does not need to be destroyed as it is considered
+* to be implicitly created and destroyed by the vkInstance
+*/
+void WYVKDevice::destroy()
+{
+    vkDestroyDevice(m_device, nullptr);
 }
 
 
@@ -86,6 +97,13 @@ WYVKDevice::QueueFamilyIndices WYVKDevice::findQueueFamilies(VkPhysicalDevice de
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             indices.graphicsFamily = i;
         }
+        // Check for present support (capability for a device to present to the surface)
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
+
+        if (presentSupport) {
+            indices.presentFamily = i;
+        }
     }
 
     return indices;
@@ -97,13 +115,24 @@ void WYVKDevice::createLogicalDevice(VkInstance instance, std::vector<const char
     WYVKDevice::QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice);
     VkPhysicalDeviceFeatures deviceFeatures{};
 
-    float queuePriority = 1.0f;
-    VkDeviceCreateInfo deviceCreateInfo {};
-    VkDeviceQueueCreateInfo deviceQueueInfo {};
-    VKInfo::createDeviceQueueInfo(deviceQueueInfo, indices.graphicsFamily.value(), 1, &queuePriority);
-    VKInfo::createDeviceInfo(deviceCreateInfo, deviceQueueInfo, deviceFeatures, validationLayers);
 
-    VK_CALL(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device));
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+
+    // Create queue info's for all queue families in uniqueQueueFamilies
+    // Some queue families may have the same index which is ok.
+    float queuePriority = 1.0f;
+    for (uint32_t queueFamily : uniqueQueueFamilies) {
+        VkDeviceQueueCreateInfo deviceQueueInfo{}; 
+        VKInfo::createDeviceQueueInfo(deviceQueueInfo, queueFamily, 1, &queuePriority);
+        queueCreateInfos.push_back(deviceQueueInfo);
+    }
+
+    VkDeviceCreateInfo deviceCreateInfo {};
+    VKInfo::createDeviceInfo(deviceCreateInfo, queueCreateInfos, deviceFeatures, validationLayers);
+
+    VK_CALL(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device), "Unable to create Vulkan device!");
+    vkGetDeviceQueue(m_device, indices.presentFamily.value(), 0, &m_presentQueue);
 }
 
 }

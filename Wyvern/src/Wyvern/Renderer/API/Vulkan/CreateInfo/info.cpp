@@ -1,6 +1,6 @@
 #pragma once
 #include "Wyvern/core.h"
-
+#include "info.h"
 
 namespace Wyvern {
 
@@ -23,10 +23,10 @@ namespace Wyvern {
             createInfo.apiVersion = VK_API_VERSION_1_0;
         }
 
-        void createDeviceInfo(VkDeviceCreateInfo& createInfo, VkDeviceQueueCreateInfo& queueCreateInfo, VkPhysicalDeviceFeatures& deviceFeatures, std::vector<const char*>& validationLayers) {
+        void createDeviceInfo(VkDeviceCreateInfo& createInfo, std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, VkPhysicalDeviceFeatures& deviceFeatures, std::vector<const char*>& validationLayers) {
             createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-            createInfo.pQueueCreateInfos = &queueCreateInfo;
-            createInfo.queueCreateInfoCount = 1;
+            createInfo.pQueueCreateInfos = queueCreateInfos.data();
+            createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
             createInfo.pEnabledFeatures = &deviceFeatures;
             createInfo.enabledExtensionCount = 0;
             createInfo.ppEnabledExtensionNames = nullptr;
@@ -45,6 +45,13 @@ namespace Wyvern {
             createInfo.queueFamilyIndex = queueFamilyIndex;
             createInfo.queueCount = queueCount;
             createInfo.pQueuePriorities = queuePriority;
+        }
+
+        void createWin32SurfaceInfo(VkWin32SurfaceCreateInfoKHR& createInfo, GLFWwindow* window)
+        {
+            createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+            createInfo.hwnd = glfwGetWin32Window(window);
+            createInfo.hinstance = GetModuleHandle(nullptr);
         }
 
     }

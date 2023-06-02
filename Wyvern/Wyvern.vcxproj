@@ -163,6 +163,7 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_debug.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_device.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.cpp" />
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_surface.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\renderer.cpp" />
   </ItemGroup>
   <ItemGroup>

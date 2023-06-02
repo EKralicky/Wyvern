@@ -2,8 +2,9 @@
 
 namespace Wyvern {
 
-void WYVKRenderer::init()
+void WYVKRenderer::init(GLFWwindow* window)
 {
+    m_window = window;
     m_validationLayers.push_back("VK_LAYER_KHRONOS_validation");
 
     // Retrieve createInfo for messenger
@@ -12,14 +13,9 @@ void WYVKRenderer::init()
 
     // Create VK instance
 	createInstance(m_instance, messengerCreateInfo);
-
-    // Initialize debug messenger
-    WYVKMessenger debugMessenger;
-    debugMessenger.initialize(m_instance, messengerCreateInfo);
-
-    // Setup devices
-    WYVKDevice device;
-    device.initialize(m_instance, m_validationLayers);
+    m_debugMessenger.initialize(m_instance, messengerCreateInfo);    // Initialize debug messenger
+    m_surface.initialize(m_instance, m_window);    // Initialize surface
+    m_device.initialize(m_instance, m_validationLayers);    // Setup devices
 }
 
 void WYVKRenderer::destroy()
@@ -27,7 +23,8 @@ void WYVKRenderer::destroy()
     if (ENABLE_VALIDATION_LAYERS) {
         m_debugMessenger.destroy(m_instance, nullptr);
     }
-    vkDestroyDevice(m_device.getLogicalDevice(), nullptr);
+    m_device.destroy();
+    m_surface.destroy(m_instance);
     vkDestroyInstance(m_instance, nullptr);
 }
 
@@ -70,7 +67,7 @@ void WYVKRenderer::createInstance(VkInstance& instance, VkDebugUtilsMessengerCre
         WYVERN_LOG_INFO("\t{}", createInfo.ppEnabledExtensionNames[i]);
     }
 
-    VK_CALL(vkCreateInstance(&createInfo, nullptr, &instance));
+    VK_CALL(vkCreateInstance(&createInfo, nullptr, &instance), "Unable to create Vulkan instance!");
 }
 
 bool WYVKRenderer::checkValidationLayerSupport(const std::vector<const char*>& validationLayers)
