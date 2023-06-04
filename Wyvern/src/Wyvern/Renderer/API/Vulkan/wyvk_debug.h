@@ -17,7 +17,7 @@ public:
 		return VK_FALSE; // Do not abort callback
 	}
 	
-	void initialize(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+	WYVKMessenger(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 	void destroy(VkInstance instance, const VkAllocationCallbacks* pAllocator);
 
 private:

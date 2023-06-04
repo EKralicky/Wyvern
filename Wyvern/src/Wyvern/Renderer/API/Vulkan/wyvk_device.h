@@ -3,25 +3,14 @@
 
 #include "Wyvern/core.h"
 #include "CreateInfo/info.h"
+#include "Wyvern/Renderer/API/Vulkan/wyvk_instance.h"
+#include "Wyvern/Renderer/API/Vulkan/wyvk_surface.h"
 
 namespace Wyvern {
 
 class WYVKDevice
 {
 public:
-	void initialize(VkInstance instance, std::vector<const char*>& validationLayers, VkSurfaceKHR surface);
-	void destroy();
-
-	inline VkPhysicalDevice getPhysicalDevice() const {
-		WYVERN_ASSERT((m_physicalDevice != VK_NULL_HANDLE), "Failed to retrieve physical device. m_device is VK_NULL_HANDLE!");
-		return m_physicalDevice;
-	}
-
-	inline VkDevice getLogicalDevice() const {
-		WYVERN_ASSERT((m_device != VK_NULL_HANDLE), "Failed to retrieve logical device. m_device is VK_NULL_HANDLE!");
-		return m_device;
-	}
-
 	struct QueueFamilyIndices {
 		std::optional<uint32_t> graphicsFamily;
 		std::optional<uint32_t> presentFamily;
@@ -31,17 +20,51 @@ public:
 		}
 	};
 
+public:
+	WYVKDevice(WYVKInstance& instance, WYVKSurface& surface);
+	void destroy();
+
+	void createPhysicalDevice();
+	void createLogicalDevice();
+
+	inline VkPhysicalDevice getPhysicalDevice() const {
+		WYVERN_ASSERT((m_physicalDevice != VK_NULL_HANDLE), "Failed to retrieve physical device. m_device is VK_NULL_HANDLE!");
+		return m_physicalDevice;
+	}
+
+	inline VkDevice getLogicalDevice() const {
+		WYVERN_ASSERT((m_logicalDevice != VK_NULL_HANDLE), "Failed to retrieve logical device. m_device is VK_NULL_HANDLE!");
+		return m_logicalDevice;
+	}
+
+	inline QueueFamilyIndices getQueueFamilyIndices() const {
+		return m_queueFamilyIndices;
+	}
+
 private:
 	std::vector<VkPhysicalDevice> queryPhysicalDevices(VkInstance instance);
-	bool rateDeviceSuitability(const VkPhysicalDevice device);
-	bool isDeviceSuitable(const VkPhysicalDevice device); 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-	void createLogicalDevice(VkInstance instance, std::vector<const char*>& validationLayers);
 
+	bool ratePhysicalDeviceSuitability(VkPhysicalDevice device);
+	bool isPhysicalDeviceSuitable(VkPhysicalDevice device);
+	bool checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device);
+
+	const std::vector<const char*> m_deviceExtensions = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	};
+
+	QueueFamilyIndices m_queueFamilyIndices;
 	VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
-	VkDevice m_device = VK_NULL_HANDLE;
-	VkSurfaceKHR m_surface;
-	VkQueue m_presentQueue;
+	VkDevice m_logicalDevice = VK_NULL_HANDLE;
+	
+	// Queues
+	VkQueue m_presentQueue = VK_NULL_HANDLE;
+	VkQueue m_graphicsQueue = VK_NULL_HANDLE;
+
+	//Handles
+	WYVKInstance& m_instance;
+	WYVKSurface& m_surface;
+	
 };
 
 }

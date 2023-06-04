@@ -4,11 +4,10 @@
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
-
-#include "Wyvern/Log.h"
-#include "vk_utility/wyvk.h"
-
 #include <string>
+#include <memory>
+
+#include "Wyvern/logger.h"
 
 // Wyvern macros
 #define WYV_DEBUG_BREAK __debugbreak()

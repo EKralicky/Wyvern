@@ -158,26 +158,31 @@
     <ClCompile Include="src\vk_utility\WYVK.cpp" />
     <ClCompile Include="src\wyvern.cpp" />
     <ClCompile Include="src\Wyvern\application.cpp" />
-    <ClCompile Include="src\Wyvern\log.cpp" />
+    <ClCompile Include="src\Wyvern\logger.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\CreateInfo\info.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_debug.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_device.cpp" />
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_instance.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_surface.cpp" />
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_swapchain.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\renderer.cpp" />
+    <ClCompile Include="src\Wyvern\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\vk_utility\WYVK.h" />
     <ClInclude Include="src\Wyvern\application.h" />
     <ClInclude Include="src\Wyvern\core.h" />
-    <ClInclude Include="src\Wyvern\log.h" />
+    <ClInclude Include="src\Wyvern\logger.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\CreateInfo\info.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_debug.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_device.h" />
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_instance.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_surface.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_swapchain.h" />
     <ClInclude Include="src\Wyvern\Renderer\renderer.h" />
+    <ClInclude Include="src\Wyvern\window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

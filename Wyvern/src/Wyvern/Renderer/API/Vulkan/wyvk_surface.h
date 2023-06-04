@@ -1,6 +1,8 @@
 #pragma once
 #include "Wyvern/core.h"
 #include "Wyvern/Renderer/API/Vulkan/CreateInfo/info.h"
+#include "Wyvern/Renderer/API/Vulkan/wyvk_instance.h"
+#include "Wyvern/window.h"
 
 namespace Wyvern {
 /*
@@ -13,11 +15,18 @@ namespace Wyvern {
 class WYVKSurface
 {
 public:
-	void initialize(VkInstance instance, GLFWwindow* window);
-	void destroy(VkInstance instance);
-	void createGLFWSurface(VkInstance instance, GLFWwindow* window);
+	WYVKSurface(WYVKInstance& instance, Window& window);
+	void destroy();
+
+	void createGLFWSurface();
+	void createWin32Surface();
+	inline VkSurfaceKHR getSurface() const { return m_surface; }
 private:
 	VkSurfaceKHR m_surface;
+
+	// Handles
+	WYVKInstance& m_instance;
+	Window& m_window;
 };
 
 

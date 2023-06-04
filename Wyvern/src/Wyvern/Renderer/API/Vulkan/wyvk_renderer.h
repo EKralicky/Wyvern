@@ -1,35 +1,27 @@
 #pragma once
 #include "Wyvern/core.h"
 #include "CreateInfo/info.h"
-#include "Wyvern/Renderer/API/Vulkan/wyvk_debug.h"
 #include "Wyvern/Renderer/API/Vulkan/wyvk_device.h"
 #include "Wyvern/Renderer/API/Vulkan/wyvk_swapchain.h"
 #include "Wyvern/Renderer/API/Vulkan/wyvk_surface.h"
+#include "Wyvern/Renderer/API/Vulkan/wyvk_instance.h"
+#include "Wyvern/window.h"
 
 namespace Wyvern {
 
 class WYVKRenderer
 {
 public:
-    void init(GLFWwindow* window);
+    WYVKRenderer(Window& window);
     void destroy();
 
 private:
-    void createInstance(VkInstance& instance, VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo);
 
-    bool checkValidationLayerSupport(const std::vector<const char*>& validationLayers);
-    void getRequiredExtensions(std::vector<const char*>& extensions);
+    std::unique_ptr<WYVKInstance> m_instance;
+    std::unique_ptr<WYVKSurface> m_surface;
+    std::unique_ptr<WYVKDevice> m_device;
 
-    VkInstance m_instance;
-    VkQueue m_graphicsQueue;
-    WYVKDevice m_device;
-    WYVKMessenger m_debugMessenger;
-    WYVKSurface m_surface;
-
-    GLFWwindow* m_window; // pointer to GLFW window
-
-    std::vector<const char*> m_validationLayers;
-    std::vector<const char*> m_enabledExtensions;
+    Window& m_window;
 };
 
 }

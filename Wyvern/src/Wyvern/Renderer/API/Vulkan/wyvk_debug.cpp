@@ -2,7 +2,7 @@
 
 namespace Wyvern {
 
-void WYVKMessenger::initialize(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+WYVKMessenger::WYVKMessenger(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT& createInfo)
 {
     if (!ENABLE_VALIDATION_LAYERS) return;
     if (createDebugMessengerEXT(instance, &createInfo, nullptr) != VK_SUCCESS) {

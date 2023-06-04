@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Core.h"
+#include "window.h"
 #include "Wyvern/Renderer/API/Vulkan/wyvk_renderer.h"
 
 namespace Wyvern {
@@ -17,8 +18,8 @@ namespace Wyvern {
 //    GLFWwindow* share;
 //};
 
-static const uint32_t WIDTH = 800;
-static const uint32_t HEIGHT = 600;
+static const uint32_t WINDOW_WIDTH = 800;
+static const uint32_t WINDOW_HEIGHT = 600;
 
 class Application
 {
@@ -30,18 +31,12 @@ public:
     void run();
 
 private:
-    GLFWwindow* m_window;
-    WYVKRenderer m_renderer;
-    /*VkInstance m_instance;
-    VkDebugUtilsMessengerEXT m_debugMessenger;
-    VkPhysicalDevice m_physicalDevice           = VK_NULL_HANDLE;
-    VkDevice m_device;
-    VkQueue m_graphicsQueue;*/
+    std::unique_ptr<Logger> m_logger;
+    std::unique_ptr<Window> m_window;
+    std::unique_ptr<WYVKRenderer>m_renderer;
 
-    void initNativeWindow(int width, int height, const char* title);
-    void initVulkan();
+    void initRenderAPI();
     void mainLoop();
-    void cleanup();
 };
 
 }

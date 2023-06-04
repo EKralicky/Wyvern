@@ -5,31 +5,12 @@
 
 namespace Wyvern {
 
-void WYVKDevice::initialize(VkInstance instance, std::vector<const char*>& validationLayers, VkSurfaceKHR surface)
+WYVKDevice::WYVKDevice(WYVKInstance& instance, WYVKSurface& surface)
+    : m_instance(instance),
+    m_surface(surface)
 {
-    m_surface = surface;
-    std::vector<VkPhysicalDevice> devices = queryPhysicalDevices(instance);
-    std::multimap<int, VkPhysicalDevice> candidates;
-
-    for (const auto& device : devices) {
-        int score = rateDeviceSuitability(device);
-        candidates.insert(std::make_pair(score, device));
-    }
-    WYVERN_LOG_WARN("size {}", candidates.size());
-    // Check if the best candidate is suitable at all
-    if (candidates.rbegin()->first > 0) {
-        m_physicalDevice = candidates.rbegin()->second;
-    }
-    else {
-        throw std::runtime_error("failed to find a suitable GPU!");
-    }
-
-    VkPhysicalDeviceProperties deviceProperties;
-    vkGetPhysicalDeviceProperties(m_physicalDevice, &deviceProperties);
-
-    WYVERN_ASSERT(isDeviceSuitable(m_physicalDevice), "The chosen physical device is not suitable for graphics rendering!!!");
-    WYVERN_LOG_INFO("Chosen device: {} {} {}", deviceProperties.deviceName, deviceProperties.deviceID, deviceProperties.driverVersion);
-    createLogicalDevice(instance, validationLayers);
+    createPhysicalDevice();
+    createLogicalDevice();
 }
 
 /*
@@ -38,10 +19,61 @@ void WYVKDevice::initialize(VkInstance instance, std::vector<const char*>& valid
 */
 void WYVKDevice::destroy()
 {
-    vkDestroyDevice(m_device, nullptr);
+    vkDestroyDevice(m_logicalDevice, nullptr);
 }
 
 
+void WYVKDevice::createPhysicalDevice() {
+    // Retrieve valid physical devices from the system
+    std::vector<VkPhysicalDevice> devices = queryPhysicalDevices(m_instance.getInstance());
+    std::multimap<int, VkPhysicalDevice> candidates;
+
+    // Choose best device based on rating
+    for (const auto& device : devices) {
+        int score = ratePhysicalDeviceSuitability(device);
+        candidates.insert(std::make_pair(score, device));
+    }
+    WYVERN_LOG_WARN("size {}", candidates.size());
+    if (candidates.rbegin()->first > 0) {     // Check if the best candidate is suitable at all
+        m_physicalDevice = candidates.rbegin()->second;
+    }
+    else {
+        throw std::runtime_error("failed to find a suitable GPU!");
+    }
+
+    // Get device properties, log, and check if the device is suitable at all. If not, exit the program
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(m_physicalDevice, &deviceProperties);
+    WYVERN_LOG_INFO("Chosen device: {} {} {}", deviceProperties.deviceName, deviceProperties.deviceID, deviceProperties.driverVersion);
+    WYVERN_ASSERT(isPhysicalDeviceSuitable(m_physicalDevice), "The chosen physical device is not suitable for graphics rendering!!!");
+}
+// We need to pass in validation layers because the logical device has separate validation layers than the instance
+// We essentially need to sync them up so they are the same
+void WYVKDevice::createLogicalDevice() {
+    WYVKDevice::QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice);
+    VkPhysicalDeviceFeatures deviceFeatures{};
+
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+
+    // Create queue info's for all queue families in uniqueQueueFamilies
+    // Some queue families may have the same index which is ok.
+    float queuePriority = 1.0f;
+    for (uint32_t queueFamily : uniqueQueueFamilies) {
+        VkDeviceQueueCreateInfo deviceQueueInfo{};
+        VKInfo::createDeviceQueueInfo(deviceQueueInfo, queueFamily, 1, &queuePriority);
+        queueCreateInfos.push_back(deviceQueueInfo);
+    }
+
+    VkDeviceCreateInfo deviceCreateInfo{};
+    VKInfo::createDeviceInfo(deviceCreateInfo, queueCreateInfos, deviceFeatures);
+    VK_CALL(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_logicalDevice), "Unable to create Vulkan logical device!");
+
+    vkGetDeviceQueue(m_logicalDevice, indices.presentFamily.value(), 0, &m_presentQueue);
+    vkGetDeviceQueue(m_logicalDevice, indices.graphicsFamily.value(), 0, &m_graphicsQueue);
+}
+
+//  Retrieves a list of physical device objects representing the physical devices installed in the system
 std::vector<VkPhysicalDevice> WYVKDevice::queryPhysicalDevices(VkInstance instance)
 {
     uint32_t deviceCount = 0;
@@ -56,7 +88,7 @@ std::vector<VkPhysicalDevice> WYVKDevice::queryPhysicalDevices(VkInstance instan
 }
 
 // Gives a score to each potential device. Higher scores are better GPU's and will be the primary choice
-bool WYVKDevice::rateDeviceSuitability(const VkPhysicalDevice device)
+bool WYVKDevice::ratePhysicalDeviceSuitability(VkPhysicalDevice device)
 {
     int deviceScore = 0;
     // Properties such as name, type, supported VK version
@@ -74,10 +106,32 @@ bool WYVKDevice::rateDeviceSuitability(const VkPhysicalDevice device)
     return deviceScore;
 }
 
-bool WYVKDevice::isDeviceSuitable(const VkPhysicalDevice device)
+// Checks if a given device is suitable or not for our requirements. e.g. checks for extension support
+bool WYVKDevice::isPhysicalDeviceSuitable(VkPhysicalDevice device)
 {
     QueueFamilyIndices indices = findQueueFamilies(device);
-    return indices.hasAllValidFamilies();
+    bool extensionsSupported = checkPhysicalDeviceExtensionSupport(device);
+
+    return indices.hasAllValidFamilies() && extensionsSupported;
+}
+
+// Retrieves all available extensions from the device and checks the extensions against the m_deviceExtensions member variable to
+// see if our required extensions exist
+bool WYVKDevice::checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device)
+{
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(m_deviceExtensions.begin(), m_deviceExtensions.end());
+
+    for (const auto& extension : availableExtensions) {
+        requiredExtensions.erase(extension.extensionName);
+    }
+
+    return requiredExtensions.empty();
 }
 
 WYVKDevice::QueueFamilyIndices WYVKDevice::findQueueFamilies(VkPhysicalDevice device)
@@ -99,7 +153,7 @@ WYVKDevice::QueueFamilyIndices WYVKDevice::findQueueFamilies(VkPhysicalDevice de
         }
         // Check for present support (capability for a device to present to the surface)
         VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface.getSurface(), &presentSupport);
 
         if (presentSupport) {
             indices.presentFamily = i;
@@ -107,32 +161,6 @@ WYVKDevice::QueueFamilyIndices WYVKDevice::findQueueFamilies(VkPhysicalDevice de
     }
 
     return indices;
-}
-
-// We need to pass in validation layers because the logical device has separate validation layers than the instance
-// We essentially need to sync them up so they are the same
-void WYVKDevice::createLogicalDevice(VkInstance instance, std::vector<const char*>& validationLayers) {
-    WYVKDevice::QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice);
-    VkPhysicalDeviceFeatures deviceFeatures{};
-
-
-    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
-
-    // Create queue info's for all queue families in uniqueQueueFamilies
-    // Some queue families may have the same index which is ok.
-    float queuePriority = 1.0f;
-    for (uint32_t queueFamily : uniqueQueueFamilies) {
-        VkDeviceQueueCreateInfo deviceQueueInfo{}; 
-        VKInfo::createDeviceQueueInfo(deviceQueueInfo, queueFamily, 1, &queuePriority);
-        queueCreateInfos.push_back(deviceQueueInfo);
-    }
-
-    VkDeviceCreateInfo deviceCreateInfo {};
-    VKInfo::createDeviceInfo(deviceCreateInfo, queueCreateInfos, deviceFeatures, validationLayers);
-
-    VK_CALL(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device), "Unable to create Vulkan device!");
-    vkGetDeviceQueue(m_device, indices.presentFamily.value(), 0, &m_presentQueue);
 }
 
 }

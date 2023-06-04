@@ -5,31 +5,30 @@ namespace Wyvern {
 
 Application::Application()
 {
-	Log logger;
-	logger.Init();
-	WYVERN_LOG_INFO("Successfully initialized logger");
+	m_logger = std::make_unique<Logger>();
+	m_logger->init();
+	m_window = std::make_unique<Window>("Wyvern App");
+
+	initRenderAPI();
+	m_renderer = std::make_unique<WYVKRenderer>(*m_window);
 }
 
 Application::~Application()
 {
-
+	m_renderer->destroy();
+	m_window->destroy();
 }
 
 void Application::run()
 {
-	initNativeWindow(WIDTH, HEIGHT, "Vulkan");
-	initVulkan();
 	mainLoop();
-	cleanup();
 }
 
-void Application::initNativeWindow(int width, int height, const char* title)
+void Application::mainLoop()
 {
-	WYVERN_LOG_INFO("Initializing Native window");
-	glfwInit();										// Initialize GLFW library
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);	// Do not create an opengl context since we are using VK. (GLFW was originally dessigned to do this)
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);		// Disable resizing
-	m_window = glfwCreateWindow(width, height, title, nullptr, nullptr); // Create window instance
+	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {
+		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
+	}
 }
 
 void checkGLFWSupportedExtensions(std::vector<VkExtensionProperties>& availableExtensionProperties)
@@ -62,7 +61,7 @@ Vulkan API Pattern: (https://vulkan-tutorial.com)
 	Pointer to the variable that stores the handle to the new object
 
 */
-void Application::initVulkan()
+void Application::initRenderAPI()
 {
 	/*
 	Vulkan extensions are addendums to the Vulkan specification that drivers are not required to support. 
@@ -80,30 +79,6 @@ void Application::initVulkan()
 		WYVERN_LOG_INFO("\t{}", extension.extensionName);
 	}
 	checkGLFWSupportedExtensions(extensions);
-
-	m_renderer.init(m_window);
-
-	//VkDebugUtilsMessengerCreateInfoEXT debugMessengerInfo;
-	//WYVK::createDebugMessengerInfo(debugMessengerInfo);
-	//WYVK::createInstance(m_instance, debugMessengerInfo);
-	//WYVK::initDebugMessenger(m_instance, debugMessengerInfo, m_debugMessenger);
-	//WYVK::pickPhysicalDevice(m_instance, m_physicalDevice);
-	//WYVK::createLogicalDevice(m_instance, m_physicalDevice, m_device);
-	//vkGetDeviceQueue(m_device, indices.graphicsFamily.value(), 0, &graphicsQueue);
-}
-
-void Application::mainLoop()
-{
-	while (!glfwWindowShouldClose(m_window)) {
-		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
-	}
-}
-
-void Application::cleanup()
-{
-	m_renderer.destroy();
-	glfwDestroyWindow(m_window);
-	glfwTerminate();
 }
 
 }

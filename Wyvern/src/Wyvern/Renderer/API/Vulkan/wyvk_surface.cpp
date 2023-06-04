@@ -11,20 +11,20 @@ namespace Wyvern {
 	Vulkan utilizes "surfaces" as a medium to interface with the window system. In this case, the function
 	specifically creates a Win32 surface, which is the Windows-specific type of surface that Vulkan uses.
 */
-void Wyvern::WYVKSurface::initialize(VkInstance instance, GLFWwindow* window)
+WYVKSurface::WYVKSurface(WYVKInstance& instance, Window& window)
+	: m_instance(instance), m_window(window)
 {
-	VkWin32SurfaceCreateInfoKHR createInfo{};
-	VKInfo::createWin32SurfaceInfo(createInfo, window);
-	VK_CALL(vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &m_surface), "Unable to create Vulkan Win32 surface!")
+	createWin32Surface();
+	createGLFWSurface();
 }
 
 /*
 	Destroying a VkSurfaceKHR merely severs the connection between Vulkan and the native surface, 
 	and does not imply destroying the native surface, closing a window, or similar behavior.
 */
-void WYVKSurface::destroy(VkInstance instance)
+void WYVKSurface::destroy()
 {
-	vkDestroySurfaceKHR(instance, m_surface, nullptr);
+	vkDestroySurfaceKHR(m_instance.getInstance(), m_surface, nullptr);
 }
 
 /*
@@ -36,12 +36,17 @@ void WYVKSurface::destroy(VkInstance instance)
 	It is the responsibility of the caller to destroy the window surface. 
 	GLFW does not destroy it for you. Call vkDestroySurfaceKHR to destroy the surface.
 */
-void WYVKSurface::createGLFWSurface(VkInstance instance, GLFWwindow* window)
+void WYVKSurface::createGLFWSurface()
 {
-	VK_CALL(glfwCreateWindowSurface(instance, window, nullptr, &m_surface), "Unable to create GLFW window surface!")
+	VK_CALL(glfwCreateWindowSurface(m_instance.getInstance(), m_window.getNativeWindow(), nullptr, &m_surface), "Unable to create GLFW window surface!")
 }
 
-
+void WYVKSurface::createWin32Surface()
+{
+	VkWin32SurfaceCreateInfoKHR createInfo{};
+	VKInfo::createWin32SurfaceInfo(createInfo, m_window.getNativeWindow());
+	VK_CALL(vkCreateWin32SurfaceKHR(m_instance.getInstance(), &createInfo, nullptr, &m_surface), "Unable to create Vulkan Win32 surface!");
+}
 
 }
 
