@@ -4,7 +4,6 @@
 #include "wyvk_surface.h"
 #include "wyvk_device.h"
 
-
 namespace Wyvern {
 
 /*
@@ -19,14 +18,6 @@ namespace Wyvern {
 */
 class WYVKSwapchain
 {
-
-public:
-    struct SwapChainSupportDetails {
-        VkSurfaceCapabilitiesKHR capabilities; 
-        std::vector<VkSurfaceFormatKHR> formats; // color depth
-        std::vector<VkPresentModeKHR> presentModes; // conditions for "swapping" images to the screen
-    };
-
 public:
     WYVKSwapchain(WYVKInstance& instance, WYVKDevice& device, WYVKSurface& surface, Window& window);
     void destroy();
@@ -41,17 +32,18 @@ private:
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
-    VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
-    SwapChainSupportDetails m_supportDetails;
-
-
     // Handles
     WYVKInstance& m_instance;
     WYVKSurface& m_surface;
     WYVKDevice& m_device;  
     Window& m_window;
 
+    VkExtent2D m_extent;
+    VkFormat m_format;
 
+    VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
+    WYVKSurface::SurfaceSupportDetails& m_supportDetails;
+    std::vector<VkImage> swapChainImages; // Swapchain images will automatically be cleaned up when the swapchain is destroyed
 };
 
 }

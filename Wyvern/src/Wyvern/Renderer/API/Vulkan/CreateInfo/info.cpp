@@ -23,21 +23,21 @@ namespace Wyvern {
             createInfo.apiVersion = VK_API_VERSION_1_0;
         }
 
-        void createDeviceInfo(VkDeviceCreateInfo& createInfo, std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, VkPhysicalDeviceFeatures& deviceFeatures) {
+        void createDeviceInfo(VkDeviceCreateInfo& createInfo, std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, VkPhysicalDeviceFeatures& deviceFeatures, const std::vector<const char*>& deviceExtensions, const std::vector<const char*>& validationLayers) {
             createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
             createInfo.pQueueCreateInfos = queueCreateInfos.data();
             createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
             createInfo.pEnabledFeatures = &deviceFeatures;
-            //createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
-            //createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+            createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+            createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-            //if (ENABLE_VALIDATION_LAYERS) {
-            //    createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-            //    createInfo.ppEnabledLayerNames = validationLayers.data();
-            //}
-            //else {
-            //    createInfo.enabledLayerCount = 0;
-            //}
+            if (ENABLE_VALIDATION_LAYERS) {
+                createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+                createInfo.ppEnabledLayerNames = validationLayers.data();
+            }
+            else {
+                createInfo.enabledLayerCount = 0;
+            }
         }
 
         void createDeviceQueueInfo(VkDeviceQueueCreateInfo& createInfo, int queueFamilyIndex, int queueCount, float* queuePriority) {

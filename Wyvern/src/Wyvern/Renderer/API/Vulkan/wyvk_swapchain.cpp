@@ -7,11 +7,10 @@ WYVKSwapchain::WYVKSwapchain(WYVKInstance& instance, WYVKDevice& device, WYVKSur
 	: m_instance(instance),
 	m_surface(surface),
 	m_device(device),
-	m_window(window)
+	m_window(window),
+	m_supportDetails(m_surface.getSupportDetails())
 {
-	m_surface.querySupportDetails();
-	m_supportDetails.formats = m_surface.getSurfaceFormats();
-	m_supportDetails.presentModes = m_surface.getPresentModes();
+
 }
 
 void WYVKSwapchain::destroy()
@@ -31,6 +30,9 @@ void WYVKSwapchain::createSwapchain()
 	VkPresentModeKHR presentMode = chooseSwapPresentMode(m_supportDetails.presentModes);
 	VkExtent2D extent = chooseSwapExtent(m_supportDetails.capabilities);
 
+	m_format = surfaceFormat.format;
+	m_extent = extent;
+
 	// Minimum number of images in swapchain
 	// Add one more than minimum to account for driver internal operation overhead
 	uint32_t imageCount = m_supportDetails.capabilities.minImageCount + 1;
@@ -41,13 +43,14 @@ void WYVKSwapchain::createSwapchain()
 	}
 
 	// Im going to be creating the create info struct here because there's too many variables to pass into a function and we need control
-	VkSwapchainCreateInfoKHR createInfo{};
+	VkSwapchainCreateInfoKHR createInfo {};
 	createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	createInfo.surface = m_surface.getSurface();
 	createInfo.minImageCount = imageCount;
 	createInfo.imageFormat = surfaceFormat.format;
 	createInfo.imageColorSpace = surfaceFormat.colorSpace;
-	//createInfo.imageExtent = extent;
+	createInfo.imageExtent = extent;
+	WYVERN_LOG_INFO("Using extent: {:d}, {:d}", extent.width, extent.height);
 	createInfo.imageArrayLayers = 1; // Always 1
 	// VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT = render directly to the swapchain. 
 	// VK_IMAGE_USAGE_TRANSFER_DST_BIT = render to separate image for post and transfer to swapchain
@@ -73,10 +76,12 @@ void WYVKSwapchain::createSwapchain()
 	createInfo.clipped = VK_TRUE; // Ignore the color of pixels that are obscured
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-	VkResult result = vkCreateSwapchainKHR(m_device.getLogicalDevice(), &createInfo, nullptr, &m_swapChain);
-	if (result != VK_SUCCESS) {
-		throw std::runtime_error("failed to create swap chain!");
-	}
+	VK_CALL(vkCreateSwapchainKHR(m_device.getLogicalDevice(), &createInfo, nullptr, &m_swapChain), "Unable to create Swapchain!");
+
+	// Retrieve handles to swapchain images
+	vkGetSwapchainImagesKHR(m_device.getLogicalDevice(), m_swapChain, &imageCount, nullptr);
+	swapChainImages.resize(imageCount);
+	vkGetSwapchainImagesKHR(m_device.getLogicalDevice(), m_swapChain, &imageCount, swapChainImages.data());
 }
 
 /* https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain 
@@ -134,7 +139,7 @@ VkPresentModeKHR WYVKSwapchain::chooseSwapPresentMode(const std::vector<VkPresen
 VkExtent2D WYVKSwapchain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 {
 	uint32_t width = capabilities.currentExtent.width;
-	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+	if (capabilities.currentExtent.width != (std::numeric_limits<uint32_t>::max)()) {
 		return capabilities.currentExtent;
 	}
 	else {

@@ -65,7 +65,7 @@ void WYVKDevice::createLogicalDevice() {
     }
 
     VkDeviceCreateInfo deviceCreateInfo{};
-    VKInfo::createDeviceInfo(deviceCreateInfo, queueCreateInfos, deviceFeatures);
+    VKInfo::createDeviceInfo(deviceCreateInfo, queueCreateInfos, deviceFeatures, m_deviceExtensions, m_instance.getValidationLayers());
     VK_CALL(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_logicalDevice), "Unable to create Vulkan logical device!");
 
     vkGetDeviceQueue(m_logicalDevice, m_queueFamilyIndices.presentFamily.value(), 0, &m_presentQueue);

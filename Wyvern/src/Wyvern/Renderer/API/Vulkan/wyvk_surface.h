@@ -16,6 +16,13 @@ namespace Wyvern {
 class WYVKSurface
 {
 public:
+	struct SurfaceSupportDetails {
+		VkSurfaceCapabilitiesKHR capabilities;
+		std::vector<VkSurfaceFormatKHR> formats; // color depth
+		std::vector<VkPresentModeKHR> presentModes; // conditions for "swapping" images to the screen
+	};
+
+public:
 	WYVKSurface(WYVKInstance& instance, WYVKDevice& device, Window& window);
 	void destroy();
 
@@ -24,13 +31,11 @@ public:
 	void querySupportDetails(); // Queries and stores surface formats and present modes
 
 	inline VkSurfaceKHR getSurface() const { return m_surface; }
-	inline std::vector<VkSurfaceFormatKHR>& getSurfaceFormats() { return m_formats; }
-	inline std::vector<VkPresentModeKHR>& getPresentModes() { return m_presentModes; }
+	inline SurfaceSupportDetails& getSupportDetails() { return m_supportDetails; }
 
 private:
 	VkSurfaceKHR m_surface;
-	std::vector<VkSurfaceFormatKHR> m_formats;
-	std::vector<VkPresentModeKHR> m_presentModes;
+	SurfaceSupportDetails m_supportDetails; // maybe make this into a unique ptr later on
 
 	// Handles
 	WYVKInstance& m_instance;

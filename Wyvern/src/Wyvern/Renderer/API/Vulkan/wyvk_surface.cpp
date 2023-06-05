@@ -16,6 +16,7 @@ WYVKSurface::WYVKSurface(WYVKInstance& instance, WYVKDevice& device, Window& win
 {
 	createWin32Surface();
 	createGLFWSurface();
+	querySupportDetails();
 }
 
 /*
@@ -50,6 +51,7 @@ void WYVKSurface::createWin32Surface()
 
 void WYVKSurface::querySupportDetails()
 {
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_device.getPhysicalDevice(), m_surface, &m_supportDetails.capabilities);
 	/*
 	* Query supported surface formats
 	*/
@@ -57,8 +59,11 @@ void WYVKSurface::querySupportDetails()
 	vkGetPhysicalDeviceSurfaceFormatsKHR(m_device.getPhysicalDevice(), m_surface, &formatCount, nullptr);
 
 	if (formatCount != 0) {
-		m_formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(m_device.getPhysicalDevice(), m_surface, &formatCount, m_formats.data());
+		m_supportDetails.formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(m_device.getPhysicalDevice(), m_surface, &formatCount, m_supportDetails.formats.data());
+	}
+	else {
+		throw std::runtime_error("Format count is 0!");
 	}
 
 	/*
@@ -68,6 +73,7 @@ void WYVKSurface::querySupportDetails()
 	*/ 
 	VkBool32 presentSupport = false;
 	vkGetPhysicalDeviceSurfaceSupportKHR(m_device.getPhysicalDevice(), m_device.getQueueFamilyIndices().presentFamily.value(), m_surface, &presentSupport);
+	WYVERN_ASSERT(presentSupport, "The current present queue family does not have present support!")
 
 	/*
 	* Query supported presentation modes
@@ -76,8 +82,11 @@ void WYVKSurface::querySupportDetails()
 	vkGetPhysicalDeviceSurfacePresentModesKHR(m_device.getPhysicalDevice(), m_surface, &presentModeCount, nullptr);
 
 	if (presentModeCount != 0) {
-		m_presentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(m_device.getPhysicalDevice(), m_surface, &presentModeCount, m_presentModes.data());
+		m_supportDetails.presentModes.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(m_device.getPhysicalDevice(), m_surface, &presentModeCount, m_supportDetails.presentModes.data());
+	}
+	else {
+		throw std::runtime_error("No present modes available! Present mode count is 0!");
 	}
 }
 

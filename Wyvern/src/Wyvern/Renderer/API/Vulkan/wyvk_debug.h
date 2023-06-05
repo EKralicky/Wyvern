@@ -1,6 +1,7 @@
 #pragma once
 #include "Wyvern/core.h"
 #include "CreateInfo/info.h"
+#include <iostream>
 
 namespace Wyvern {
 
@@ -12,7 +13,7 @@ public:
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData) {
-
+		//std::cout << pCallbackData->pMessage << "\n";
 		WYVERN_LOG_RENDER_API("validation layer: {}", pCallbackData->pMessage);
 		return VK_FALSE; // Do not abort callback
 	}
