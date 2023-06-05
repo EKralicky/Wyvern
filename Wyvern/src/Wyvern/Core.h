@@ -1,4 +1,5 @@
 #pragma once
+#define NOMINMAX
 #define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -6,6 +7,8 @@
 #include <GLFW/glfw3native.h>
 #include <string>
 #include <memory>
+#include <algorithm>
+#include <cstdint>
 
 #include "Wyvern/logger.h"
 

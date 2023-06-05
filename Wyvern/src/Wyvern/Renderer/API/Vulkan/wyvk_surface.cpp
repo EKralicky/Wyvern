@@ -11,8 +11,8 @@ namespace Wyvern {
 	Vulkan utilizes "surfaces" as a medium to interface with the window system. In this case, the function
 	specifically creates a Win32 surface, which is the Windows-specific type of surface that Vulkan uses.
 */
-WYVKSurface::WYVKSurface(WYVKInstance& instance, Window& window)
-	: m_instance(instance), m_window(window)
+WYVKSurface::WYVKSurface(WYVKInstance& instance, WYVKDevice& device, Window& window)
+	: m_instance(instance), m_device(device), m_window(window)
 {
 	createWin32Surface();
 	createGLFWSurface();
@@ -46,6 +46,39 @@ void WYVKSurface::createWin32Surface()
 	VkWin32SurfaceCreateInfoKHR createInfo{};
 	VKInfo::createWin32SurfaceInfo(createInfo, m_window.getNativeWindow());
 	VK_CALL(vkCreateWin32SurfaceKHR(m_instance.getInstance(), &createInfo, nullptr, &m_surface), "Unable to create Vulkan Win32 surface!");
+}
+
+void WYVKSurface::querySupportDetails()
+{
+	/*
+	* Query supported surface formats
+	*/
+	uint32_t formatCount;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(m_device.getPhysicalDevice(), m_surface, &formatCount, nullptr);
+
+	if (formatCount != 0) {
+		m_formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(m_device.getPhysicalDevice(), m_surface, &formatCount, m_formats.data());
+	}
+
+	/*
+	* Check for present support (capability for a device to present to the surface)
+	* Since the device is initialized before the surface and the device checks if the queue families are valid, we know presentFamily has a valid index
+	* Queue families are checked and queried in the findQueueFamilies() function in the Device class
+	*/ 
+	VkBool32 presentSupport = false;
+	vkGetPhysicalDeviceSurfaceSupportKHR(m_device.getPhysicalDevice(), m_device.getQueueFamilyIndices().presentFamily.value(), m_surface, &presentSupport);
+
+	/*
+	* Query supported presentation modes
+	*/
+	uint32_t presentModeCount;
+	vkGetPhysicalDeviceSurfacePresentModesKHR(m_device.getPhysicalDevice(), m_surface, &presentModeCount, nullptr);
+
+	if (presentModeCount != 0) {
+		m_presentModes.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(m_device.getPhysicalDevice(), m_surface, &presentModeCount, m_presentModes.data());
+	}
 }
 
 }

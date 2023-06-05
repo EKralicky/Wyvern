@@ -1,8 +1,9 @@
 #pragma once
 #include "Wyvern/core.h"
 #include "Wyvern/Renderer/API/Vulkan/CreateInfo/info.h"
-#include "Wyvern/Renderer/API/Vulkan/wyvk_instance.h"
 #include "Wyvern/window.h"
+#include "wyvk_instance.h"
+#include "wyvk_device.h"
 
 namespace Wyvern {
 /*
@@ -15,17 +16,25 @@ namespace Wyvern {
 class WYVKSurface
 {
 public:
-	WYVKSurface(WYVKInstance& instance, Window& window);
+	WYVKSurface(WYVKInstance& instance, WYVKDevice& device, Window& window);
 	void destroy();
 
 	void createGLFWSurface();
 	void createWin32Surface();
+	void querySupportDetails(); // Queries and stores surface formats and present modes
+
 	inline VkSurfaceKHR getSurface() const { return m_surface; }
+	inline std::vector<VkSurfaceFormatKHR>& getSurfaceFormats() { return m_formats; }
+	inline std::vector<VkPresentModeKHR>& getPresentModes() { return m_presentModes; }
+
 private:
 	VkSurfaceKHR m_surface;
+	std::vector<VkSurfaceFormatKHR> m_formats;
+	std::vector<VkPresentModeKHR> m_presentModes;
 
 	// Handles
 	WYVKInstance& m_instance;
+	WYVKDevice& m_device;
 	Window& m_window;
 };
 

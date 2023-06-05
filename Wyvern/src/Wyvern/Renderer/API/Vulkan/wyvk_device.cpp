@@ -5,9 +5,8 @@
 
 namespace Wyvern {
 
-WYVKDevice::WYVKDevice(WYVKInstance& instance, WYVKSurface& surface)
-    : m_instance(instance),
-    m_surface(surface)
+WYVKDevice::WYVKDevice(WYVKInstance& instance)
+    : m_instance(instance)
 {
     createPhysicalDevice();
     createLogicalDevice();
@@ -50,11 +49,11 @@ void WYVKDevice::createPhysicalDevice() {
 // We need to pass in validation layers because the logical device has separate validation layers than the instance
 // We essentially need to sync them up so they are the same
 void WYVKDevice::createLogicalDevice() {
-    WYVKDevice::QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice);
+    m_queueFamilyIndices = findQueueFamilies(m_physicalDevice);
     VkPhysicalDeviceFeatures deviceFeatures{};
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+    std::set<uint32_t> uniqueQueueFamilies = { m_queueFamilyIndices.graphicsFamily.value(), m_queueFamilyIndices.presentFamily.value() };
 
     // Create queue info's for all queue families in uniqueQueueFamilies
     // Some queue families may have the same index which is ok.
@@ -69,8 +68,8 @@ void WYVKDevice::createLogicalDevice() {
     VKInfo::createDeviceInfo(deviceCreateInfo, queueCreateInfos, deviceFeatures);
     VK_CALL(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_logicalDevice), "Unable to create Vulkan logical device!");
 
-    vkGetDeviceQueue(m_logicalDevice, indices.presentFamily.value(), 0, &m_presentQueue);
-    vkGetDeviceQueue(m_logicalDevice, indices.graphicsFamily.value(), 0, &m_graphicsQueue);
+    vkGetDeviceQueue(m_logicalDevice, m_queueFamilyIndices.presentFamily.value(), 0, &m_presentQueue);
+    vkGetDeviceQueue(m_logicalDevice, m_queueFamilyIndices.graphicsFamily.value(), 0, &m_graphicsQueue);
 }
 
 //  Retrieves a list of physical device objects representing the physical devices installed in the system
@@ -145,17 +144,16 @@ WYVKDevice::QueueFamilyIndices WYVKDevice::findQueueFamilies(VkPhysicalDevice de
 
     int i = 0;
     for (const auto& queueFamily : queueFamilies) {
-        if (indices.hasAllValidFamilies()) {
+
+        if (indices.hasAllValidFamilies()) { // Breaks out of loop if all families are valid
             break;
         }
+
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             indices.graphicsFamily = i;
         }
-        // Check for present support (capability for a device to present to the surface)
-        VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface.getSurface(), &presentSupport);
 
-        if (presentSupport) {
+        if (queueFamily.queueCount > 0) {
             indices.presentFamily = i;
         }
     }

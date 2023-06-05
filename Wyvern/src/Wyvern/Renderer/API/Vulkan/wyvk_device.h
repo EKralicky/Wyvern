@@ -4,7 +4,6 @@
 #include "Wyvern/core.h"
 #include "CreateInfo/info.h"
 #include "Wyvern/Renderer/API/Vulkan/wyvk_instance.h"
-#include "Wyvern/Renderer/API/Vulkan/wyvk_surface.h"
 
 namespace Wyvern {
 
@@ -21,7 +20,7 @@ public:
 	};
 
 public:
-	WYVKDevice(WYVKInstance& instance, WYVKSurface& surface);
+	WYVKDevice(WYVKInstance& instance);
 	void destroy();
 
 	void createPhysicalDevice();
@@ -62,9 +61,7 @@ private:
 	VkQueue m_graphicsQueue = VK_NULL_HANDLE;
 
 	//Handles
-	WYVKInstance& m_instance;
-	WYVKSurface& m_surface;
-	
+	WYVKInstance& m_instance;	
 };
 
 }
