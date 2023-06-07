@@ -10,5 +10,6 @@ namespace Wyvern {
         void createDeviceInfo(VkDeviceCreateInfo& createInfo, std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, VkPhysicalDeviceFeatures& deviceFeatures, const std::vector<const char*>& deviceExtensions, const std::vector<const char*>& validationLayers);
         void createDeviceQueueInfo(VkDeviceQueueCreateInfo& createInfo, int queueFamilyIndex, int queueCount, float* queuePriority);
         void createWin32SurfaceInfo(VkWin32SurfaceCreateInfoKHR& createInfo, GLFWwindow* window);
+        void createImageViewInfo(VkImageViewCreateInfo& createInfo, VkImage& image, VkFormat& imageFormat);
     }
 }

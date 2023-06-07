@@ -8,6 +8,7 @@
 #include <memory>
 #include <algorithm>
 #include <cstdint>
+#include <filesystem>
 
 #include "Wyvern/logger.h"
 

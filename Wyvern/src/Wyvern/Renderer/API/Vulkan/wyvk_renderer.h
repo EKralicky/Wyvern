@@ -7,6 +7,7 @@
 #include "wyvk_swapchain.h"
 #include "wyvk_surface.h"
 #include "wyvk_instance.h"
+#include "Pipelines/wyvk_graphics_pipeline.h"
 
 namespace Wyvern {
 
@@ -22,6 +23,8 @@ private:
     std::unique_ptr<WYVKDevice> m_device;
     std::unique_ptr<WYVKSurface> m_surface;
     std::unique_ptr<WYVKSwapchain> m_swapchain;
+
+    std::unique_ptr<WYVKGraphicsPipeline> m_graphicsPipeline;
 
     Window& m_window;
 };

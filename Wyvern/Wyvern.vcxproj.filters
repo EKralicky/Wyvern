@@ -54,6 +54,12 @@
     <ClCompile Include="src\Wyvern\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_graphics_pipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\vk_utility\WYVK.h">
@@ -95,5 +101,18 @@
     <ClInclude Include="src\Wyvern\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_graphics_pipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Wyvern\Assets\Shaders\vertex.vert" />
+    <None Include="src\Wyvern\Assets\Shaders\fragment.frag" />
+    <None Include="src\Wyvern\Assets\Shaders\compile.bat">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

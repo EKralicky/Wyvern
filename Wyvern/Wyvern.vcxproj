@@ -78,13 +78,12 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\include;C:\Users\Evan\source\lib\glm;C:\VulkanSDK\1.3.250.0\Include;C:\Users\Evan\source\lib\spdlog-1.11.0\include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.250.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vulkan-1.lib;glfw3.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.250.0\Lib\Debug;C:\VulkanSDK\1.3.250.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vulkan-1.lib;glfw3.lib;shaderc_combined.lib;glslangd.lib;SPIRVd.lib;OGLCompilerd.lib;OSDependentd.lib;HLSLd.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
@@ -99,7 +98,6 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\include;C:\Users\Evan\source\lib\glm;C:\VulkanSDK\1.3.250.0\Include;C:\Users\Evan\source\lib\spdlog-1.11.0\include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,7 +105,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.250.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vulkan-1.lib;glfw3.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vulkan-1.lib;glfw3.lib;shaderc_combined.lib;glslang.lib;SPIRV.lib;OGLCompiler.lib;OSDependent.lib;HLSL.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
@@ -120,13 +118,12 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\include;C:\Users\Evan\source\lib\glm;C:\VulkanSDK\1.3.250.0\Include;C:\Users\Evan\source\lib\spdlog-1.11.0\include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.250.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vulkan-1.lib;glfw3.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.250.0\Lib\Debug;C:\VulkanSDK\1.3.250.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vulkan-1.lib;glfw3.lib;shaderc_combined.lib;glslangd.lib;SPIRVd.lib;OGLCompilerd.lib;OSDependentd.lib;HLSLd.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
@@ -141,7 +138,6 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\include;C:\Users\Evan\source\lib\glm;C:\VulkanSDK\1.3.250.0\Include;C:\Users\Evan\source\lib\spdlog-1.11.0\include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,7 +145,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Evan\source\lib\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.250.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vulkan-1.lib;glfw3.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vulkan-1.lib;glfw3.lib;shaderc_combined.lib;glslang.lib;SPIRV.lib;OGLCompiler.lib;OSDependent.lib;HLSL.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
@@ -160,6 +156,8 @@
     <ClCompile Include="src\Wyvern\application.cpp" />
     <ClCompile Include="src\Wyvern\logger.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\CreateInfo\info.cpp" />
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_graphics_pipeline.cpp" />
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_shader.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_debug.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_device.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_instance.cpp" />
@@ -175,6 +173,8 @@
     <ClInclude Include="src\Wyvern\core.h" />
     <ClInclude Include="src\Wyvern\logger.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\CreateInfo\info.h" />
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_graphics_pipeline.h" />
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_shader.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_debug.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_device.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_instance.h" />
@@ -183,6 +183,11 @@
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_swapchain.h" />
     <ClInclude Include="src\Wyvern\Renderer\renderer.h" />
     <ClInclude Include="src\Wyvern\window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Wyvern\Assets\Shaders\compile.bat" />
+    <None Include="src\Wyvern\Assets\Shaders\fragment.frag" />
+    <None Include="src\Wyvern\Assets\Shaders\vertex.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

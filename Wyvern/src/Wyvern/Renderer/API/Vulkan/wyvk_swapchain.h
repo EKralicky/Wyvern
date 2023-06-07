@@ -24,6 +24,7 @@ public:
 
     void validateSwapchainSupport();
     void createSwapchain();
+    void createImageViews();
 
     inline VkSwapchainKHR getSwapchain() { return m_swapChain; }
 
@@ -43,7 +44,8 @@ private:
 
     VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
     WYVKSurface::SurfaceSupportDetails& m_supportDetails;
-    std::vector<VkImage> swapChainImages; // Swapchain images will automatically be cleaned up when the swapchain is destroyed
+    std::vector<VkImage> m_swapChainImages; // Swapchain images will automatically be cleaned up when the swapchain is destroyed
+    std::vector<VkImageView> m_swapChainImageViews;
 };
 
 }

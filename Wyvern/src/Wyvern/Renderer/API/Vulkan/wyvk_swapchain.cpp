@@ -15,6 +15,9 @@ WYVKSwapchain::WYVKSwapchain(WYVKInstance& instance, WYVKDevice& device, WYVKSur
 
 void WYVKSwapchain::destroy()
 {
+	for (auto imageView : m_swapChainImageViews) {
+		vkDestroyImageView(m_device.getLogicalDevice(), imageView, nullptr);
+	}
 	vkDestroySwapchainKHR(m_device.getLogicalDevice(), m_swapChain, nullptr);
 }
 
@@ -80,8 +83,18 @@ void WYVKSwapchain::createSwapchain()
 
 	// Retrieve handles to swapchain images
 	vkGetSwapchainImagesKHR(m_device.getLogicalDevice(), m_swapChain, &imageCount, nullptr);
-	swapChainImages.resize(imageCount);
-	vkGetSwapchainImagesKHR(m_device.getLogicalDevice(), m_swapChain, &imageCount, swapChainImages.data());
+	m_swapChainImages.resize(imageCount);
+	vkGetSwapchainImagesKHR(m_device.getLogicalDevice(), m_swapChain, &imageCount, m_swapChainImages.data());
+}
+
+void WYVKSwapchain::createImageViews()
+{
+	m_swapChainImageViews.resize(m_swapChainImages.size());
+	for (size_t i = 0; i < m_swapChainImages.size(); i++) {
+		VkImageViewCreateInfo createInfo{};
+		VKInfo::createImageViewInfo(createInfo, m_swapChainImages[i], m_format);
+		VK_CALL(vkCreateImageView(m_device.getLogicalDevice(), &createInfo, nullptr, &m_swapChainImageViews[i]), "Unable to create image view! Index: " + std::to_string(i))
+	}
 }
 
 /* https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain 
