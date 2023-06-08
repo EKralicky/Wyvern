@@ -24,6 +24,7 @@ private:
     std::unique_ptr<WYVKSurface> m_surface;
     std::unique_ptr<WYVKSwapchain> m_swapchain;
 
+    std::unique_ptr<WYVKRenderPass> m_renderPass; // might need multiple render passes and pipelines later on
     std::unique_ptr<WYVKGraphicsPipeline> m_graphicsPipeline;
 
     Window& m_window;

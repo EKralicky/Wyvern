@@ -60,6 +60,9 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_graphics_pipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_renderpass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\vk_utility\WYVK.h">
@@ -105,6 +108,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_renderpass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

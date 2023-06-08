@@ -40,7 +40,7 @@ void WYVKSwapchain::createSwapchain()
 	// Add one more than minimum to account for driver internal operation overhead
 	uint32_t imageCount = m_supportDetails.capabilities.minImageCount + 1;
 
-	// Make sure minimum inage count does not exceed maximum image count
+	// Make sure minimum image count does not exceed maximum image count
 	if (m_supportDetails.capabilities.maxImageCount > 0 && imageCount > m_supportDetails.capabilities.maxImageCount) {
 		imageCount = m_supportDetails.capabilities.maxImageCount;
 	}
@@ -94,6 +94,28 @@ void WYVKSwapchain::createImageViews()
 		VkImageViewCreateInfo createInfo{};
 		VKInfo::createImageViewInfo(createInfo, m_swapChainImages[i], m_format);
 		VK_CALL(vkCreateImageView(m_device.getLogicalDevice(), &createInfo, nullptr, &m_swapChainImageViews[i]), "Unable to create image view! Index: " + std::to_string(i))
+	}
+}
+
+void WYVKSwapchain::createFrameBuffers(VkRenderPass renderPass)
+{
+	swapChainFramebuffers.resize(m_swapChainImageViews.size());
+
+	for (size_t i = 0; i < m_swapChainImageViews.size(); i++) {
+		VkImageView attachments[] = {
+			m_swapChainImageViews[i]
+		};
+
+		VkFramebufferCreateInfo framebufferInfo{};
+		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.renderPass = renderPass;
+		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.pAttachments = attachments;
+		framebufferInfo.width = m_extent.width;
+		framebufferInfo.height = m_extent.height;
+		framebufferInfo.layers = 1;
+
+		VK_CALL(vkCreateFramebuffer(m_device.getLogicalDevice(), &framebufferInfo, nullptr, &swapChainFramebuffers[i]), "Failed to create framebuffer!");
 	}
 }
 

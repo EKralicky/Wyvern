@@ -10,7 +10,7 @@ namespace Wyvern {
 * The Swapchain is essentially a queue of frames/images that are waiting to be presented on the screen
 * It is mainly used to synchronize the presentation of the images with the refresh rate of the screen
 * 
-* he swapping is done in synchronization with the screen's refresh rate to avoid tearing. 
+* The swapping is done in synchronization with the screen's refresh rate to avoid tearing. 
 * "Tearing" is a visual artifact that happens when the screen displays parts of multiple frames in a single screen draw, 
 * which can occur when a new frame is swapped in while the screen is in the middle of a refresh. 
 * By syncing the swapping with the screen's refresh rate, only whole frames are drawn.
@@ -25,10 +25,14 @@ public:
     void validateSwapchainSupport();
     void createSwapchain();
     void createImageViews();
+    void createFrameBuffers(VkRenderPass renderPass);
 
     inline VkSwapchainKHR getSwapchain() { return m_swapChain; }
+    inline VkExtent2D getExtent() { return m_extent; }
+    inline VkFormat getImageFormat() { return m_format; }
 
 private:
+    // Basically chooses the best format, present mode, and extent from the available options retrieved from the GLFW window
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
@@ -46,6 +50,7 @@ private:
     WYVKSurface::SurfaceSupportDetails& m_supportDetails;
     std::vector<VkImage> m_swapChainImages; // Swapchain images will automatically be cleaned up when the swapchain is destroyed
     std::vector<VkImageView> m_swapChainImageViews;
+    std::vector<VkFramebuffer> swapChainFramebuffers;
 };
 
 }
