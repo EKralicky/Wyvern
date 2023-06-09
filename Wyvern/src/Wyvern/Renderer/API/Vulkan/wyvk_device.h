@@ -40,6 +40,9 @@ public:
 		return m_queueFamilyIndices;
 	}
 
+	inline VkQueue getGraphicsQueue() { return m_graphicsQueue; }
+	inline VkQueue getPresentQueue() { return m_presentQueue; }
+
 private:
 	std::vector<VkPhysicalDevice> queryPhysicalDevices(VkInstance instance);
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);

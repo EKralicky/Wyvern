@@ -17,8 +17,12 @@
 #define WYVERN_ASSERT(assert_on, msg) if (!assert_on) { WYVERN_LOG_ERROR("Assertion Failed: {}", msg); WYV_DEBUG_BREAK; }
 
 // Vulkan macros
-#define VK_CALL(x, msg) if (x != VK_SUCCESS) throw std::runtime_error(std::string("VK call failed! - ") + msg);
-
+#define VK_CALL(x, msg) { \
+    if (x != VK_SUCCESS) { \
+        WYVERN_LOG_ERROR(std::string("VK_CALL Failed! - ") + msg); \
+        throw std::runtime_error(std::string("VK_CALL Failed! - ") + msg); \
+    } \
+}
 #ifdef NDEBUG
 	#define ENABLE_VALIDATION_LAYERS false
 #else

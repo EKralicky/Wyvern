@@ -26,7 +26,51 @@ void Application::run()
 
 void Application::drawFrame()
 {
+	uint32_t imageIndex; // Current swapchain image index we are drawing to
 
+	// Wait for the fences from the last loop of this frame index
+	// Since we started our fence in the signaled state, this will not block
+	m_renderer->waitForFences(m_currentFrame);
+
+	// Aquire next image from the swap chain & store index in imageIndex
+	imageIndex = m_renderer->aquireNextSwapchainImage(m_currentFrame);
+
+	WYVKCommandBuffer* cmdBuffer = m_renderer->getCommandBuffers()[m_currentFrame].get();
+	// RECORDING START
+	cmdBuffer->reset();
+	cmdBuffer->startRecording();
+	VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+	m_renderer->beginRenderPass(cmdBuffer, imageIndex, clearColor);
+
+	// Get swapchain extent
+	VkExtent2D& extent = m_renderer->getSwapchain().getExtent();
+
+	// Set dynamic viewport
+	VkViewport viewport{};
+	viewport.x = 0.0f;
+	viewport.y = 0.0f;
+	viewport.width = static_cast<float>(extent.width);
+	viewport.height = static_cast<float>(extent.height);
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+	m_renderer->setViewport(cmdBuffer, viewport);
+
+	// Set dynamic scissor
+	VkRect2D scissor{};
+	scissor.offset = { 0, 0 };
+	scissor.extent = extent;
+	m_renderer->setScissor(cmdBuffer, scissor);
+
+	m_renderer->bindPipeline(cmdBuffer);
+	m_renderer->draw(cmdBuffer, 3, 1, 0, 0);
+	m_renderer->endRenderPass(cmdBuffer);
+	cmdBuffer->stopRecording();
+	// RECORDING STOP
+
+	m_renderer->submitCommandBuffer(cmdBuffer, m_currentFrame);
+	m_renderer->present(m_currentFrame, imageIndex);
+
+	m_currentFrame = (m_currentFrame + 1) % WYVKRenderer::MAX_FRAMES_IN_FLIGHT;
 }
 
 void Application::mainLoop()
@@ -35,6 +79,7 @@ void Application::mainLoop()
 		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
 		drawFrame();
 	}
+	VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!");
 }
 
 void checkGLFWSupportedExtensions(std::vector<VkExtensionProperties>& availableExtensionProperties)

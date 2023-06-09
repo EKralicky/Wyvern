@@ -13,9 +13,11 @@ public:
 
 	void startRecording();
 	void stopRecording();
+	void reset();
+
 	void submit();
 
-	inline VkCommandBuffer getCommandBuffer() { return m_commandBuffer; }
+	inline VkCommandBuffer* getCommandBuffer() { return &m_commandBuffer; }
 
 private:
 	VkCommandBuffer m_commandBuffer = VK_NULL_HANDLE;

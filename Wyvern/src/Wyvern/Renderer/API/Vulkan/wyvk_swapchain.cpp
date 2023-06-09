@@ -15,7 +15,7 @@ WYVKSwapchain::WYVKSwapchain(WYVKInstance& instance, WYVKDevice& device, WYVKSur
 
 void WYVKSwapchain::destroy()
 {
-	for (auto framebuffer : swapChainFramebuffers) {
+	for (auto framebuffer : m_swapChainFramebuffers) {
 		vkDestroyFramebuffer(m_device.getLogicalDevice(), framebuffer, nullptr);
 	}
 	for (auto imageView : m_swapChainImageViews) {
@@ -102,7 +102,7 @@ void WYVKSwapchain::createImageViews()
 
 void WYVKSwapchain::createFrameBuffers(VkRenderPass renderPass)
 {
-	swapChainFramebuffers.resize(m_swapChainImageViews.size());
+	m_swapChainFramebuffers.resize(m_swapChainImageViews.size());
 
 	for (size_t i = 0; i < m_swapChainImageViews.size(); i++) {
 		VkImageView attachments[] = {
@@ -118,7 +118,7 @@ void WYVKSwapchain::createFrameBuffers(VkRenderPass renderPass)
 		framebufferInfo.height = m_extent.height;
 		framebufferInfo.layers = 1;
 
-		VK_CALL(vkCreateFramebuffer(m_device.getLogicalDevice(), &framebufferInfo, nullptr, &swapChainFramebuffers[i]), "Failed to create framebuffer!");
+		VK_CALL(vkCreateFramebuffer(m_device.getLogicalDevice(), &framebufferInfo, nullptr, &m_swapChainFramebuffers[i]), "Failed to create framebuffer!");
 	}
 }
 

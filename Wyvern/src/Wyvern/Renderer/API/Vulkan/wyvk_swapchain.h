@@ -28,9 +28,9 @@ public:
     void createFrameBuffers(VkRenderPass renderPass);
 
     inline VkSwapchainKHR getSwapchain() { return m_swapChain; }
-    inline VkExtent2D getExtent() { return m_extent; }
-    inline VkFormat getImageFormat() { return m_format; }
-    inline std::vector<VkFramebuffer> getFrameBuffers() { return swapChainFramebuffers; }
+    inline VkExtent2D& getExtent() { return m_extent; }
+    inline VkFormat& getImageFormat() { return m_format; }
+    inline std::vector<VkFramebuffer>& getFrameBuffers() { return m_swapChainFramebuffers; }
 
 private:
     // Basically chooses the best format, present mode, and extent from the available options retrieved from the GLFW window
@@ -51,7 +51,7 @@ private:
     WYVKSurface::SurfaceSupportDetails& m_supportDetails;
     std::vector<VkImage> m_swapChainImages; // Swapchain images will automatically be cleaned up when the swapchain is destroyed
     std::vector<VkImageView> m_swapChainImageViews;
-    std::vector<VkFramebuffer> swapChainFramebuffers;
+    std::vector<VkFramebuffer> m_swapChainFramebuffers;
 };
 
 }

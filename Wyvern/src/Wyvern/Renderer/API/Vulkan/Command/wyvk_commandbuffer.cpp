@@ -13,8 +13,8 @@ WYVKCommandBuffer::WYVKCommandBuffer(WYVKDevice& device, WYVKCommandPool& comman
 
 	// VK_COMMAND_BUFFER_LEVEL_PRIMARY: Can be submitted to a queue for execution, but cannot be called from other command buffers.
 	// VK_COMMAND_BUFFER_LEVEL_SECONDARY : Cannot be submitted directly, but can be called from primary command buffers.
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = 1;
+	allocInfo.level = level;
+	allocInfo.commandBufferCount = count;
 	VK_CALL(vkAllocateCommandBuffers(m_device.getLogicalDevice(), &allocInfo, &m_commandBuffer), "Failed to allocate command buffers!");
 }
 
@@ -41,6 +41,11 @@ void WYVKCommandBuffer::startRecording()
 void WYVKCommandBuffer::stopRecording()
 {
 	VK_CALL(vkEndCommandBuffer(m_commandBuffer), "Failed to record command buffer!");
+}
+
+void WYVKCommandBuffer::reset()
+{
+	vkResetCommandBuffer(m_commandBuffer, 0);
 }
 
 }

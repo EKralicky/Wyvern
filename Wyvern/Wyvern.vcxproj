@@ -191,7 +191,7 @@
     <ClInclude Include="src\Wyvern\window.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\Wyvern\Assets\Shaders\compile.bat" />
+    <None Include="src\Wyvern\Assets\Shaders\_manual_compile.bat" />
     <None Include="src\Wyvern\Assets\Shaders\fragment.frag" />
     <None Include="src\Wyvern\Assets\Shaders\vertex.vert" />
   </ItemGroup>

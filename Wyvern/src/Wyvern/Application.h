@@ -32,6 +32,8 @@ public:
     void drawFrame();
 
 private:
+    uint32_t m_currentFrame = 0;
+
     std::unique_ptr<Logger> m_logger;
     std::unique_ptr<Window> m_window;
     std::unique_ptr<WYVKRenderer>m_renderer;

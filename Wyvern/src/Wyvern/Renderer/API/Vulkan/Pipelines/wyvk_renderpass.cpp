@@ -70,6 +70,19 @@ void WYVKRenderPass::createRenderPass()
 	subpass.colorAttachmentCount = 1;
 	subpass.pColorAttachments = &colorAttachmentRef; // This is the REFERENCE not the actual attachment. This is to have the ability to reuse attachments through a reference in different subpasses
 
+	/*
+	* =============================================
+	* SUBPASS DEPENDENCIES
+	* =============================================
+	*/
+	VkSubpassDependency dependency{};
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL; // Source/before subpass. EXTERNAL here represents the implicit starting subpass
+	dependency.dstSubpass = 0; // Destination subpass index
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; // Wait on color attachment image before proceeding with the next subpass
+	dependency.srcAccessMask = 0;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; // What we are doing next basically. The operations that are waiting on the VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
 	// =============================================
 	// NOTE
 	// =============================================
@@ -84,6 +97,8 @@ void WYVKRenderPass::createRenderPass()
 	renderPassInfo.pAttachments = &colorAttachment;
 	renderPassInfo.subpassCount = 1;
 	renderPassInfo.pSubpasses = &subpass;
+	renderPassInfo.dependencyCount = 1;
+	renderPassInfo.pDependencies = &dependency;
 
 	VK_CALL(vkCreateRenderPass(m_device.getLogicalDevice(), &renderPassInfo, nullptr, &m_renderPass), "Failed to create Renderpass!");
 }
