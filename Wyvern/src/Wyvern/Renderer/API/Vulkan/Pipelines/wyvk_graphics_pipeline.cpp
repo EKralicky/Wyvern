@@ -14,7 +14,6 @@ void WYVKGraphicsPipeline::destroy()
 {
     vkDestroyPipeline(m_device.getLogicalDevice(), m_graphicsPipeline, nullptr);
     vkDestroyPipelineLayout(m_device.getLogicalDevice(), m_pipelineLayout, nullptr);
-    vkDestroyRenderPass(m_device.getLogicalDevice(), m_renderPass.getRenderPass(), nullptr);
 
     WYVERN_LOG_INFO("Destroying {} shader modules", m_shaderModules.size());
     for (auto& shaderModule : m_shaderModules) {

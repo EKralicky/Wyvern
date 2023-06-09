@@ -42,8 +42,8 @@ void WYVKRenderer::destroy()
     }
 
     m_commandPool->destroy();
-    m_renderPass->destroy();
     m_graphicsPipeline->destroy();
+    m_renderPass->destroy();
     m_swapchain->destroy();
     m_device->destroy();
     m_surface->destroy();

@@ -11,7 +11,6 @@ WYVKRenderPass::WYVKRenderPass(WYVKSwapchain& swapchain, WYVKDevice& device)
 void WYVKRenderPass::destroy()
 {
 	vkDestroyRenderPass(m_device.getLogicalDevice(), m_renderPass, nullptr);
-
 }
 
 void WYVKRenderPass::createRenderPass()
