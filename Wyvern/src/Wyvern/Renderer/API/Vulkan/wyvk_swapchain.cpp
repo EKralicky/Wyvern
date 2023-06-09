@@ -15,6 +15,9 @@ WYVKSwapchain::WYVKSwapchain(WYVKInstance& instance, WYVKDevice& device, WYVKSur
 
 void WYVKSwapchain::destroy()
 {
+	for (auto framebuffer : swapChainFramebuffers) {
+		vkDestroyFramebuffer(m_device.getLogicalDevice(), framebuffer, nullptr);
+	}
 	for (auto imageView : m_swapChainImageViews) {
 		vkDestroyImageView(m_device.getLogicalDevice(), imageView, nullptr);
 	}

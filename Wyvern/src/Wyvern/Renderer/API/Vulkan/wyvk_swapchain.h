@@ -30,6 +30,7 @@ public:
     inline VkSwapchainKHR getSwapchain() { return m_swapChain; }
     inline VkExtent2D getExtent() { return m_extent; }
     inline VkFormat getImageFormat() { return m_format; }
+    inline std::vector<VkFramebuffer> getFrameBuffers() { return swapChainFramebuffers; }
 
 private:
     // Basically chooses the best format, present mode, and extent from the available options retrieved from the GLFW window

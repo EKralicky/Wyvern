@@ -87,6 +87,7 @@ void WYVKRenderPass::createRenderPass()
 
 	VK_CALL(vkCreateRenderPass(m_device.getLogicalDevice(), &renderPassInfo, nullptr, &m_renderPass), "Failed to create Renderpass!");
 }
+
 }
 //VkAttachmentDescription WYVKRenderPass::createAttachment()
 //{

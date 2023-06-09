@@ -24,10 +24,16 @@ void Application::run()
 	mainLoop();
 }
 
+void Application::drawFrame()
+{
+
+}
+
 void Application::mainLoop()
 {
 	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {
 		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
+		drawFrame();
 	}
 }
 

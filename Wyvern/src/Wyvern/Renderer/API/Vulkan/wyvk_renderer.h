@@ -8,6 +8,8 @@
 #include "wyvk_surface.h"
 #include "wyvk_instance.h"
 #include "Pipelines/wyvk_graphics_pipeline.h"
+#include "Command/wyvk_commandpool.h"
+#include "Command/wyvk_commandbuffer.h"
 
 namespace Wyvern {
 
@@ -16,6 +18,14 @@ class WYVKRenderer
 public:
     WYVKRenderer(Window& window);
     void destroy();
+
+    void recordCommandBuffers();
+
+    void beginRenderPass(WYVKCommandBuffer& commandBuffer, uint32_t imageIndex, VkClearValue& clearColor);
+    void endRenderPass(WYVKCommandBuffer& commandBuffer);
+    void bindPipeline(WYVKCommandBuffer& commandBuffer);
+    void setDynamicPipelineStates(WYVKCommandBuffer& commandBuffer, VkViewport viewport, VkRect2D scissor);
+    void draw(WYVKCommandBuffer& commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
 
 private:
 

@@ -63,6 +63,12 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_renderpass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandpool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandbuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\vk_utility\WYVK.h">
@@ -111,6 +117,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_renderpass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandpool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandbuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

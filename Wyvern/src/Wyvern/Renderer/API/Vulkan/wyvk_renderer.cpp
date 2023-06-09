@@ -34,4 +34,42 @@ void WYVKRenderer::destroy()
     m_surface->destroy();
 }
 
+void WYVKRenderer::recordCommandBuffers()
+{
+}
+
+void WYVKRenderer::beginRenderPass(WYVKCommandBuffer& commandBuffer, uint32_t imageIndex, VkClearValue& clearColor)
+{
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = m_renderPass->getRenderPass();
+    renderPassInfo.framebuffer = m_swapchain->getFrameBuffers()[imageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = m_swapchain->getExtent();
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearColor;
+    vkCmdBeginRenderPass(commandBuffer.getCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+}
+
+void WYVKRenderer::endRenderPass(WYVKCommandBuffer& commandBuffer)
+{
+    vkCmdEndRenderPass(commandBuffer.getCommandBuffer());
+}
+
+void WYVKRenderer::bindPipeline(WYVKCommandBuffer& commandBuffer)
+{
+    vkCmdBindPipeline(commandBuffer.getCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline->getPipeline());
+}
+
+void WYVKRenderer::setDynamicPipelineStates(WYVKCommandBuffer& commandBuffer, VkViewport viewport, VkRect2D scissor)
+{
+    vkCmdSetViewport(commandBuffer.getCommandBuffer(), 0, 1, &viewport);
+    vkCmdSetScissor(commandBuffer.getCommandBuffer(), 0, 1, &scissor);
+}
+
+void WYVKRenderer::draw(WYVKCommandBuffer& commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
+{
+    vkCmdDraw(commandBuffer.getCommandBuffer(), vertexCount, instanceCount, firstVertex, firstInstance);
+}
+
 }

@@ -29,6 +29,7 @@ public:
     ~Application();
         
     void run();
+    void drawFrame();
 
 private:
     std::unique_ptr<Logger> m_logger;
