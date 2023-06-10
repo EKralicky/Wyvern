@@ -127,6 +127,14 @@ VkResult WYVKRenderer::aquireNextSwapchainImage(uint32_t currentFrame, uint32_t&
 
 void WYVKRenderer::recreateSwapchain()
 {
+    int width = 0;
+    int height = 0;
+    glfwGetFramebufferSize(m_window.getNativeWindow(), &width, &height);
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(m_window.getNativeWindow(), &width, &height);
+        glfwWaitEvents();
+    }
+
     vkDeviceWaitIdle(m_device->getLogicalDevice());
     WYVERN_LOG_INFO("Recreating swapchain");
 
