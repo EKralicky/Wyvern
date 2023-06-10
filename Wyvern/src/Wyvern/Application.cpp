@@ -26,14 +26,26 @@ void Application::run()
 
 void Application::drawFrame()
 {
-	uint32_t imageIndex; // Current swapchain image index we are drawing to
+	uint32_t imageIndex = 0; // Current swapchain image index we are drawing to
 
 	// Wait for the fences from the last loop of this frame index
 	// Since we started our fence in the signaled state, this will not block
 	m_renderer->waitForFences(m_currentFrame);
 
 	// Aquire next image from the swap chain & store index in imageIndex
-	imageIndex = m_renderer->aquireNextSwapchainImage(m_currentFrame);
+	VkResult result = m_renderer->aquireNextSwapchainImage(m_currentFrame, imageIndex);
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || m_window->isFramebufferResized()) {
+		m_window->setFramebufferResized(false);
+		m_renderer->recreateSwapchain();
+		return;
+	}
+	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+		throw std::runtime_error("Failed to acquire swap chain image!");
+	}
+
+	// Reset fences only if we have an image from the swapchain to process
+	// This is to avoid deadlock if we reset the swapchain in the above codes
+	m_renderer->resetFences(m_currentFrame);
 
 	WYVKCommandBuffer* cmdBuffer = m_renderer->getCommandBuffers()[m_currentFrame].get();
 	// RECORDING START

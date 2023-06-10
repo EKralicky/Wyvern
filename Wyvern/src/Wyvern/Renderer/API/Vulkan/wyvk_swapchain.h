@@ -48,7 +48,7 @@ private:
     VkFormat m_format;
 
     VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
-    WYVKSurface::SurfaceSupportDetails& m_supportDetails;
+    WYVKSurface::SurfaceSupportDetails m_supportDetails;
     std::vector<VkImage> m_swapChainImages; // Swapchain images will automatically be cleaned up when the swapchain is destroyed
     std::vector<VkImageView> m_swapChainImageViews;
     std::vector<VkFramebuffer> m_swapChainFramebuffers;

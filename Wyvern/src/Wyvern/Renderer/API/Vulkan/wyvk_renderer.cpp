@@ -25,8 +25,9 @@ WYVKRenderer::WYVKRenderer(Window& window)
     m_swapchain->createImageViews();
     m_swapchain->createFrameBuffers(m_renderPass->getRenderPass());
 
+    m_commandPool = std::make_unique<WYVKCommandPool>(*m_device);
     createSyncObjects();
-    allocateCommandBuffers();
+    createCommandBuffers();
 }
 
 void WYVKRenderer::destroy()
@@ -49,14 +50,21 @@ void WYVKRenderer::destroy()
     m_surface->destroy();
 }
 
-void WYVKRenderer::allocateCommandBuffers()
+void WYVKRenderer::createCommandBuffers()
 {
-    m_commandPool = std::make_unique<WYVKCommandPool>(*m_device);
     m_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         m_commandBuffers[i] = std::make_unique<WYVKCommandBuffer>(*m_device, *m_commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
     }
+}
+
+void WYVKRenderer::recreateCommandBuffers()
+{
+    for (size_t i = 0; i < m_commandBuffers.size(); i++) {
+        m_commandBuffers[i]->destroy();
+    }
+    createCommandBuffers();
 }
 
 void WYVKRenderer::beginRenderPass(WYVKCommandBuffer* commandBuffer, uint32_t imageIndex, VkClearValue& clearColor)
@@ -103,11 +111,32 @@ void WYVKRenderer::setScissor(WYVKCommandBuffer* commandBuffer, VkRect2D& scisso
     vkCmdSetScissor(*commandBuffer->getCommandBuffer(), 0, 1, &scissor);
 }
 
-uint32_t WYVKRenderer::aquireNextSwapchainImage(uint32_t currentFrame)
+/*
+* ok so currently my waitforcences function is waiting on the fence then immediately resetting it. but this basically depends on the last iteration of drawframe.
+* what i think is happening, is that its waiting for the previous frame to finish "vkWaitForFences" then it blocks there. once its finished, the fences get immidiately
+* reset ready for the next frame iteration. but the problem with that and recreating the swapchain is that if we return early and never get to rendering the frame,
+* the vkWaitForFences will hang indefinitely because the fence will never get flagged because theres no work being done. The way to fix this is to delay the fence reset
+* until we know that we have a frame to be rendered. If we can't get the swapchain images then the function will return, but the fence wont be blocked because
+* it was never reset and its still in the flagged state
+*/
+VkResult WYVKRenderer::aquireNextSwapchainImage(uint32_t currentFrame, uint32_t& imageIndex)
 {
-    uint32_t imageIndex;
-    VK_CALL(vkAcquireNextImageKHR(m_device->getLogicalDevice(), m_swapchain->getSwapchain(), UINT64_MAX, m_imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex), "Failed to acquire swapchain image!");
-    return imageIndex;
+    VkResult result = vkAcquireNextImageKHR(m_device->getLogicalDevice(), m_swapchain->getSwapchain(), UINT64_MAX, m_imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+    return result;
+}
+
+void WYVKRenderer::recreateSwapchain()
+{
+    vkDeviceWaitIdle(m_device->getLogicalDevice());
+    WYVERN_LOG_INFO("Recreating swapchain");
+
+    m_swapchain->destroy();
+    
+    m_swapchain->createSwapchain();
+    m_swapchain->createImageViews();
+    m_swapchain->createFrameBuffers(m_renderPass->getRenderPass());
+    recreateSyncObjects();
+    recreateCommandBuffers();
 }
 
 void WYVKRenderer::submitCommandBuffer(WYVKCommandBuffer* commandBuffer, uint32_t currentFrame)
@@ -142,7 +171,15 @@ void WYVKRenderer::present(uint32_t currentFrame, uint32_t imageIndex)
     presentInfo.pImageIndices = &imageIndex;
     presentInfo.pResults = nullptr; // Optional
 
-    VK_CALL(vkQueuePresentKHR(m_device->getPresentQueue(), &presentInfo), "Failed to present image!");
+    VkResult result = vkQueuePresentKHR(m_device->getPresentQueue(), &presentInfo);
+
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.isFramebufferResized()) {
+        m_window.setFramebufferResized(false);
+        recreateSwapchain();
+    }
+    else if (result != VK_SUCCESS) {
+        throw std::runtime_error("Failed to present swap chain image!");
+    }
 }
 
 void WYVKRenderer::createSyncObjects()
@@ -169,9 +206,23 @@ void WYVKRenderer::createSyncObjects()
     }
 }
 
+void WYVKRenderer::recreateSyncObjects()
+{
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(m_device->getLogicalDevice(), m_renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(m_device->getLogicalDevice(), m_imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(m_device->getLogicalDevice(), m_inFlightFences[i], nullptr);
+    }
+    createSyncObjects();
+}
+
 void WYVKRenderer::waitForFences(uint32_t currentFrame)
 {
     VK_CALL(vkWaitForFences(m_device->getLogicalDevice(), 1, &m_inFlightFences[currentFrame], VK_TRUE, UINT64_MAX), "Failed to wait for fence!");
+}
+
+void WYVKRenderer::resetFences(uint32_t currentFrame)
+{
     VK_CALL(vkResetFences(m_device->getLogicalDevice(), 1, &m_inFlightFences[currentFrame]), "Failed to reset fence!");
 }
 

@@ -7,8 +7,7 @@ WYVKSwapchain::WYVKSwapchain(WYVKInstance& instance, WYVKDevice& device, WYVKSur
 	: m_instance(instance),
 	m_surface(surface),
 	m_device(device),
-	m_window(window),
-	m_supportDetails(m_surface.getSupportDetails())
+	m_window(window)
 {
 
 }
@@ -31,6 +30,8 @@ void WYVKSwapchain::validateSwapchainSupport()
 
 void WYVKSwapchain::createSwapchain()
 {
+	m_surface.querySupportDetails();
+	m_supportDetails = m_surface.getSupportDetails();
 	// Choose support details from available support details queried in the constructor
 	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(m_supportDetails.formats);
 	VkPresentModeKHR presentMode = chooseSwapPresentMode(m_supportDetails.presentModes);

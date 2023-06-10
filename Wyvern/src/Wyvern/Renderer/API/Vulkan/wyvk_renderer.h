@@ -22,22 +22,28 @@ public:
     WYVKRenderer(Window& window);
     void destroy();
 
-    void allocateCommandBuffers();
-    void beginRenderPass(WYVKCommandBuffer* commandBuffer, uint32_t imageIndex, VkClearValue& clearColor);
-    void endRenderPass(WYVKCommandBuffer* commandBuffer);
+    void createCommandBuffers();
+    void recreateCommandBuffers();
+    void createSyncObjects();
+    void recreateSyncObjects();
+
+    void waitForFences(uint32_t currentFrame);
+    void resetFences(uint32_t currentFrame);
 
     // Command buffer commands
+    void beginRenderPass(WYVKCommandBuffer* commandBuffer, uint32_t imageIndex, VkClearValue& clearColor);
+    void endRenderPass(WYVKCommandBuffer* commandBuffer);
     void bindPipeline(WYVKCommandBuffer* commandBuffer);
     void setDynamicPipelineStates(WYVKCommandBuffer* commandBuffer, VkViewport viewport, VkRect2D scissor);
     void draw(WYVKCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
     void setViewport(WYVKCommandBuffer* commandBuffer, VkViewport& viewport);
     void setScissor(WYVKCommandBuffer* commandBuffer, VkRect2D& scissor);
     
-    // Synchronization
-    void createSyncObjects();
-    void waitForFences(uint32_t currentFrame);
 
-    uint32_t aquireNextSwapchainImage(uint32_t currentFrame);
+
+    VkResult aquireNextSwapchainImage(uint32_t currentFrame, uint32_t& imageIndex);
+    void recreateSwapchain();
+
     void submitCommandBuffer(WYVKCommandBuffer* commandBuffer, uint32_t currentFrame);
     void present(uint32_t currentFrame, uint32_t imageIndex);
 
@@ -46,7 +52,6 @@ public:
     inline WYVKDevice& getDevice() { return *m_device; }
 
 private:
-
     std::unique_ptr<WYVKInstance> m_instance;
     std::unique_ptr<WYVKDevice> m_device;
     std::unique_ptr<WYVKSurface> m_surface;

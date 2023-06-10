@@ -32,7 +32,6 @@ void Wyvern::WYVKShader::compile()
     // Get contents of file in string format
     std::string source((std::istreambuf_iterator<char>(file)), 
                         std::istreambuf_iterator<char>()); 
-    WYVERN_LOG_ERROR(source);
     // Compile (source file contents, shader kind: vert or frag, file path, compiler options)
     shaderc_shader_kind kind = mapShaderStageToKind(m_shaderStage);
     shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, kind, m_filePath.string().c_str(), options);

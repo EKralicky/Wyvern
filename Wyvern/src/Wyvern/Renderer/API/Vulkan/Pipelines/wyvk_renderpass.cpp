@@ -53,7 +53,7 @@ void WYVKRenderPass::createRenderPass()
 	/*
 	* =============================================
 	* ATTACHMENT REFERENCE
-	* =============================================
+	* =============================================S
 	*/
 	VkAttachmentReference colorAttachmentRef{};
 	colorAttachmentRef.attachment = 0; // Index of attachment in attachment list
@@ -88,8 +88,6 @@ void WYVKRenderPass::createRenderPass()
 	// The layout(location = 0) out vec4 outColor directive in the GLSL fragment shader code is an output variable declaration.
 	// It means that outColor is an output from the fragment shader and its output location is 0. 
 	// This location directly corresponds to the index of the attachment in the subpass description.
-
-
 	VkRenderPassCreateInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 	renderPassInfo.attachmentCount = 1;
