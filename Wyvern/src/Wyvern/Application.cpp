@@ -5,6 +5,8 @@ namespace Wyvern {
 
 Application::Application()
 {
+	// Initializes the Wyvern console logger for manual logging and the
+	// Renderer logger for Vulkan validation layer logging
 	m_logger = std::make_unique<Logger>();
 	m_logger->init();
 	m_window = std::make_unique<Window>("Wyvern App");
@@ -89,9 +91,10 @@ void Application::mainLoop()
 {
 	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {
 		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
-		drawFrame();
+		drawFrame(); // Uses the render API to draw a single frame
 	}
-	VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!");
+	// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
+	VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!"); 
 }
 
 void checkGLFWSupportedExtensions(std::vector<VkExtensionProperties>& availableExtensionProperties)

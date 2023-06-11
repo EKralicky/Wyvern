@@ -167,7 +167,6 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_surface.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_swapchain.cpp" />
-    <ClCompile Include="src\Wyvern\Renderer\renderer.cpp" />
     <ClCompile Include="src\Wyvern\window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -187,7 +186,6 @@
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_surface.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_swapchain.h" />
-    <ClInclude Include="src\Wyvern\Renderer\renderer.h" />
     <ClInclude Include="src\Wyvern\window.h" />
   </ItemGroup>
   <ItemGroup>

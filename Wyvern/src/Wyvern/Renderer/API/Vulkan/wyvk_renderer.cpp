@@ -127,6 +127,8 @@ VkResult WYVKRenderer::aquireNextSwapchainImage(uint32_t currentFrame, uint32_t&
 
 void WYVKRenderer::recreateSwapchain()
 {
+    // Pause on window minimization
+    // When the window minimizes, the framebuffer size shrinks to 0 which is an invalid state
     int width = 0;
     int height = 0;
     glfwGetFramebufferSize(m_window.getNativeWindow(), &width, &height);

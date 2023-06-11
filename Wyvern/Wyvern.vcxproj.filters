@@ -30,9 +30,6 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Wyvern\Renderer\renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,9 +81,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Wyvern\Renderer\renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_device.h">
