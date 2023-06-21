@@ -1,7 +1,11 @@
 #include "wyvk_graphics_pipeline.h"
 #include "wyvk_renderpass.h"
+#include "../Geometry/vertex_geometry.h"
 
 namespace Wyvern {
+
+const std::vector<VkDynamicState> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+
 
 WYVKGraphicsPipeline::WYVKGraphicsPipeline(WYVKDevice& device, WYVKSwapchain& swapchain, WYVKRenderPass& renderPass)
     : m_device(device),
@@ -29,7 +33,7 @@ void WYVKGraphicsPipeline::configureShader(std::filesystem::path path, VkShaderS
     m_shaderModules.push_back(std::make_pair(shaderStage, module));
 }
 
-void WYVKGraphicsPipeline::createGraphicsPipeline()
+void WYVKGraphicsPipeline::createShaderStates()
 {
     std::filesystem::path vertexShaderPath("src\\Wyvern\\Assets\\Shaders\\vertex.vert");
     std::filesystem::path fragmentShaderPath("src\\Wyvern\\Assets\\Shaders\\fragment.frag");
@@ -47,13 +51,23 @@ void WYVKGraphicsPipeline::createGraphicsPipeline()
 
         m_shaderStages.push_back(shaderStageInfo);
     }
+}
 
-    std::vector<VkDynamicState> dynamicStates;
-    dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
-    dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
+void WYVKGraphicsPipeline::createGraphicsPipeline()
+{
+    createShaderStates();
     initializeDynamicStates(dynamicStates);
-
     initializeDefaultPipelineInfo();
+
+    auto bindingDescription = Vertex::getBindingDescription();
+    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+    m_configInfo.vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    m_configInfo.vertexInputInfo.vertexBindingDescriptionCount = 1;
+    m_configInfo.vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; // Optional
+    m_configInfo.vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    m_configInfo.vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data(); // Optional
+
     // Create Pipeline
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -78,7 +92,7 @@ void WYVKGraphicsPipeline::createGraphicsPipeline()
     VK_CALL(vkCreateGraphicsPipelines(m_device.getLogicalDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline), "Failed to create graphics pipeline!");
 }
 
-void WYVKGraphicsPipeline::initializeDynamicStates(std::vector<VkDynamicState>& dynamicStates)
+void WYVKGraphicsPipeline::initializeDynamicStates(const std::vector<VkDynamicState>& dynamicStates)
 {
     m_usingDynamicStates = true;
 
@@ -89,11 +103,6 @@ void WYVKGraphicsPipeline::initializeDynamicStates(std::vector<VkDynamicState>& 
 
 void WYVKGraphicsPipeline::initializeDefaultPipelineInfo()
 {
-    m_configInfo.vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    m_configInfo.vertexInputInfo.vertexBindingDescriptionCount = 0;
-    m_configInfo.vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-    m_configInfo.vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    m_configInfo.vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
 
     m_configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     m_configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;

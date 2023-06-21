@@ -1,5 +1,7 @@
 #include <vector>
 #include "Application.h"
+#include "Renderer/API/Vulkan/Geometry/vertex_geometry.h"
+#include "Renderer/API/Vulkan/Memory/buffer.h"
 
 namespace Wyvern {
 
@@ -26,7 +28,7 @@ void Application::run()
 	mainLoop();
 }
 
-void Application::drawFrame()
+void Application::drawFrame(VkBuffer* buffers, VkDeviceSize* offsets, uint32_t count, uint32_t vertexCount)
 {
 	uint32_t imageIndex = 0; // Current swapchain image index we are drawing to
 
@@ -34,8 +36,8 @@ void Application::drawFrame()
 	// Since we started our fence in the signaled state, this will not block
 	m_renderer->waitForFences(m_currentFrame);
 
-	// Aquire next image from the swap chain & store index in imageIndex
-	VkResult result = m_renderer->aquireNextSwapchainImage(m_currentFrame, imageIndex);
+	// Acquire next image from the swap chain & store index in imageIndex
+	VkResult result = m_renderer->acquireNextSwapchainImage(m_currentFrame, imageIndex);
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || m_window->isFramebufferResized()) {
 		m_window->setFramebufferResized(false);
 		m_renderer->recreateSwapchain();
@@ -76,7 +78,10 @@ void Application::drawFrame()
 	m_renderer->setScissor(cmdBuffer, scissor);
 
 	m_renderer->bindPipeline(cmdBuffer);
-	m_renderer->draw(cmdBuffer, 3, 1, 0, 0);
+
+	vkCmdBindVertexBuffers(*cmdBuffer->getCommandBuffer(), 0, count, buffers, offsets);
+
+	m_renderer->draw(cmdBuffer, vertexCount, 1, 0, 0);
 	m_renderer->endRenderPass(cmdBuffer);
 	cmdBuffer->stopRecording();
 	// RECORDING STOP
@@ -89,9 +94,21 @@ void Application::drawFrame()
 
 void Application::mainLoop()
 {
+	const std::vector<Vertex> vertices = {
+		{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+	};
+
+	size_t vSize = sizeof(vertices[0]) * vertices.size();
+	WYVKBuffer vertexBuffer((void*)vertices.data(), vSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_renderer->getDevice());
+	VkBuffer vertexBuffers[] = { vertexBuffer.getBuffer() };
+	VkDeviceSize offsets[] = { 0 };
+
 	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {
 		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
-		drawFrame(); // Uses the render API to draw a single frame
+		
+		drawFrame(vertexBuffers, offsets, 1, static_cast<uint32_t>(vertices.size())); // Uses the render API to draw a single frame
 	}
 	// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
 	VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!"); 

@@ -29,7 +29,7 @@ public:
     ~Application();
         
     void run();
-    void drawFrame();
+    void drawFrame(VkBuffer* buffers, VkDeviceSize* offsets, uint32_t count, uint32_t vertexCount);
 
 private:
     uint32_t m_currentFrame = 0;

@@ -119,7 +119,7 @@ void WYVKRenderer::setScissor(WYVKCommandBuffer* commandBuffer, VkRect2D& scisso
 * until we know that we have a frame to be rendered. If we can't get the swapchain images then the function will return, but the fence wont be blocked because
 * it was never reset and its still in the flagged state
 */
-VkResult WYVKRenderer::aquireNextSwapchainImage(uint32_t currentFrame, uint32_t& imageIndex)
+VkResult WYVKRenderer::acquireNextSwapchainImage(uint32_t currentFrame, uint32_t& imageIndex)
 {
     VkResult result = vkAcquireNextImageKHR(m_device->getLogicalDevice(), m_swapchain->getSwapchain(), UINT64_MAX, m_imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
     return result;

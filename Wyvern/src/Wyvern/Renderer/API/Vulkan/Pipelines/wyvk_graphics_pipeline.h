@@ -11,6 +11,9 @@
 namespace Wyvern {
 
 class WYVKGraphicsPipeline
+
+#define VERTEX_ATTRIBUTE_COUNT 2
+
 {
 public:
 	struct PipelineConfigInfo {
@@ -33,21 +36,21 @@ public:
 	void destroy();
 
 	void createGraphicsPipeline();
-	void initializeDynamicStates(std::vector<VkDynamicState>& dynamicStates);
-	void initializeDefaultPipelineInfo();
 
 	inline VkPipeline& getPipeline() { return m_graphicsPipeline; }
 	inline WYVKRenderPass& getWYVKRenderPass() { return m_renderPass; }
 
 private:
+	void initializeDynamicStates(const std::vector<VkDynamicState>& dynamicStates);
+	void initializeDefaultPipelineInfo();
 	void configureShader(std::filesystem::path path, VkShaderStageFlagBits shaderStage);
+	void createShaderStates();
 
 	std::vector<std::pair<VkShaderStageFlagBits, VkShaderModule>> m_shaderModules;
 	std::vector<VkPipelineShaderStageCreateInfo> m_shaderStages;
 	PipelineConfigInfo m_configInfo;
 	VkPipelineLayout m_pipelineLayout = nullptr;
 	VkPipeline m_graphicsPipeline;
-
 
 	bool m_usingDynamicStates = false;
 

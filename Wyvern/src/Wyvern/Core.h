@@ -9,6 +9,10 @@
 #include <algorithm>
 #include <cstdint>
 #include <filesystem>
+#include <array>
+
+// GLM for math
+#include <glm/glm.hpp>
 
 #include "Wyvern/logger.h"
 
@@ -23,6 +27,7 @@
         throw std::runtime_error(std::string("VK_CALL Failed! - ") + msg); \
     } \
 }
+
 #ifdef NDEBUG
 	#define ENABLE_VALIDATION_LAYERS false
 #else

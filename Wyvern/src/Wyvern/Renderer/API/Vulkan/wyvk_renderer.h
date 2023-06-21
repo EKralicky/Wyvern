@@ -92,7 +92,7 @@ public:
     
 
 
-    [[nodiscard]] VkResult aquireNextSwapchainImage(uint32_t currentFrame, uint32_t& imageIndex);
+    [[nodiscard]] VkResult acquireNextSwapchainImage(uint32_t currentFrame, uint32_t& imageIndex);
     void recreateSwapchain();
 
     void submitCommandBuffer(WYVKCommandBuffer* commandBuffer, uint32_t currentFrame);
