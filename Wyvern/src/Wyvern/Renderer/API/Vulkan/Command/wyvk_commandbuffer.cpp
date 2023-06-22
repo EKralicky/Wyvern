@@ -23,7 +23,7 @@ void WYVKCommandBuffer::destroy()
 	vkFreeCommandBuffers(m_device.getLogicalDevice(), m_commandPool.getCommandPool(), 1, &m_commandBuffer);
 }
 
-void WYVKCommandBuffer::startRecording()
+void WYVKCommandBuffer::startRecording(VkCommandBufferUsageFlags flags)
 {
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -31,7 +31,7 @@ void WYVKCommandBuffer::startRecording()
 	// VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT: The command buffer will be rerecorded right after executing it once.
 	// VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT : This is a secondary command buffer that will be entirely within a single render pass.
 	// VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT : The command buffer can be resubmitted while it is also already pending execution.
-	beginInfo.flags = 0; // Optional
+	beginInfo.flags = flags; // Optional
 	beginInfo.pInheritanceInfo = nullptr; // Optional
 
 	// Implicitly resets command buffer and all commands within it

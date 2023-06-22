@@ -54,7 +54,7 @@ void Application::drawFrame(VkBuffer* buffers, VkDeviceSize* offsets, uint32_t c
 	WYVKCommandBuffer* cmdBuffer = m_renderer->getCommandBuffers()[m_currentFrame].get();
 	// RECORDING START
 	cmdBuffer->reset();
-	cmdBuffer->startRecording();
+	cmdBuffer->startRecording(0);
 	VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
 	m_renderer->beginRenderPass(cmdBuffer, imageIndex, clearColor);
 
@@ -94,6 +94,8 @@ void Application::drawFrame(VkBuffer* buffers, VkDeviceSize* offsets, uint32_t c
 
 void Application::mainLoop()
 {
+
+
 	const std::vector<Vertex> vertices = {
 		{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
 		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
@@ -101,8 +103,10 @@ void Application::mainLoop()
 	};
 
 	size_t vSize = sizeof(vertices[0]) * vertices.size();
-	WYVKBuffer vertexBuffer((void*)vertices.data(), vSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_renderer->getDevice());
-	VkBuffer vertexBuffers[] = { vertexBuffer.getBuffer() };
+	m_renderer->allocateStagingBuffer(vSize);
+	std::unique_ptr<WYVKBuffer> vertexBuffer = m_renderer->createVertexBuffer((void*)vertices.data(), vSize);
+
+	VkBuffer vertexBuffers[] = { vertexBuffer->getBuffer() };
 	VkDeviceSize offsets[] = { 0 };
 
 	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {

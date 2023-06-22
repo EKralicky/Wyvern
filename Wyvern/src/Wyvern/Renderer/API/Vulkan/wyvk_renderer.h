@@ -10,6 +10,7 @@
 #include "Pipelines/wyvk_graphics_pipeline.h"
 #include "Command/wyvk_commandpool.h"
 #include "Command/wyvk_commandbuffer.h"
+#include "Memory/buffer.h"
 
 namespace Wyvern {
 
@@ -80,7 +81,7 @@ public:
     //===================================
 
     /*
-    * Command to start the render pass
+    * Command to start the render passa
     */
     void beginRenderPass(WYVKCommandBuffer* commandBuffer, uint32_t imageIndex, VkClearValue& clearColor);
     void endRenderPass(WYVKCommandBuffer* commandBuffer);
@@ -98,11 +99,15 @@ public:
     void submitCommandBuffer(WYVKCommandBuffer* commandBuffer, uint32_t currentFrame);
     void present(uint32_t currentFrame, uint32_t imageIndex);
 
+    std::unique_ptr<WYVKBuffer> createVertexBuffer(void* data, VkDeviceSize size);
+    void allocateStagingBuffer(VkDeviceSize size);
+
     inline std::vector<std::unique_ptr<WYVKCommandBuffer>>& getCommandBuffers() { return m_commandBuffers; }
     inline WYVKSwapchain& getSwapchain() { return *m_swapchain; }
     inline WYVKDevice& getDevice() { return *m_device; }
 
 private:
+
     std::unique_ptr<WYVKInstance> m_instance;
     std::unique_ptr<WYVKDevice> m_device;
     std::unique_ptr<WYVKSurface> m_surface;
@@ -113,9 +118,14 @@ private:
 
     std::vector<std::unique_ptr<WYVKCommandBuffer>> m_commandBuffers;
     std::unique_ptr<WYVKCommandPool> m_commandPool;
+
     std::vector<VkSemaphore> m_imageAvailableSemaphores;
     std::vector<VkSemaphore> m_renderFinishedSemaphores;
+
     std::vector<VkFence> m_inFlightFences;
+    VkFence m_transferFence;
+
+    std::unique_ptr<WYVKBuffer> m_stagingBuffer;
 
     Window& m_window;
 };

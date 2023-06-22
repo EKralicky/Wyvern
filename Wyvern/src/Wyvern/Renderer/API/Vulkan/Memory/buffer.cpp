@@ -2,7 +2,7 @@
 
 namespace Wyvern {
 
-WYVKBuffer::WYVKBuffer(void* data, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, WYVKDevice& device)
+WYVKBuffer::WYVKBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, WYVKDevice& device)
     : m_device(device),
     m_size(size)
 {
@@ -26,22 +26,52 @@ WYVKBuffer::WYVKBuffer(void* data, VkDeviceSize size, VkBufferUsageFlags usage, 
 
     VK_CALL(vkAllocateMemory(m_device.getLogicalDevice(), &allocInfo, nullptr, &m_bufferMemory), "Failed to allocate buffer memory!");
     VK_CALL(vkBindBufferMemory(m_device.getLogicalDevice(), m_buffer, m_bufferMemory, 0), "Unable to bind buffer memory!");
-
-    copyMemory(data);
 }
 
 WYVKBuffer::~WYVKBuffer()
 {
     vkDestroyBuffer(m_device.getLogicalDevice(), m_buffer, nullptr);
-    vkFreeMemory(m_device.getLogicalDevice(), m_bufferMemory, nullptr);
+    freeMemory();
 }
 
-void WYVKBuffer::copyMemory(void* srcData)
+void WYVKBuffer::assignMemory(void* srcData)
 {
     void* deviceData; // will hold address of device memory, accessible to the application
     VK_CALL(vkMapMemory(m_device.getLogicalDevice(), m_bufferMemory, 0, m_size, 0, &deviceData), "Unable to map memory!"); // gets address of device memory and stores in deviceData
     memcpy(deviceData, srcData, (size_t) m_size); // Copy data from srcData to the device memory
     vkUnmapMemory(m_device.getLogicalDevice(), m_bufferMemory); // unmap the pointer so it is no longer accessible
+}
+
+void WYVKBuffer::freeMemory()
+{
+    vkFreeMemory(m_device.getLogicalDevice(), m_bufferMemory, nullptr);
+}
+
+void WYVKBuffer::copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool commandPool)
+{
+    WYVKCommandBuffer cmdBuffer(m_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
+    cmdBuffer.startRecording(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+    VkBufferCopy copyRegion{};
+    copyRegion.srcOffset = 0; // Optional
+    copyRegion.dstOffset = 0; // Optional
+    copyRegion.size = size;
+    vkCmdCopyBuffer(*cmdBuffer.getCommandBuffer(), m_buffer, dst, 1, &copyRegion);
+
+    cmdBuffer.stopRecording();
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = cmdBuffer.getCommandBuffer();
+
+    vkQueueSubmit(m_device.getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(m_device.getGraphicsQueue());
+}
+
+void WYVKBuffer::copyTo(WYVKBuffer& dst, VkDeviceSize size, WYVKCommandPool commandPool)
+{
+    copyTo(dst.getBuffer(), size, commandPool);
 }
 
 uint32_t WYVKBuffer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)

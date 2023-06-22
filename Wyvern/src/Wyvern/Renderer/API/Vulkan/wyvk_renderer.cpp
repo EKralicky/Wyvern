@@ -192,6 +192,22 @@ void WYVKRenderer::present(uint32_t currentFrame, uint32_t imageIndex)
     }
 }
 
+std::unique_ptr<WYVKBuffer> WYVKRenderer::createVertexBuffer(void* data, VkDeviceSize size)
+{
+    std::unique_ptr<WYVKBuffer> vertexBuffer = std::make_unique<WYVKBuffer>(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, *m_device);
+
+    m_stagingBuffer->freeMemory();
+    m_stagingBuffer->assignMemory(data);
+    m_stagingBuffer->copyTo(*vertexBuffer, size, *m_commandPool);
+
+    return vertexBuffer;
+}
+
+void WYVKRenderer::allocateStagingBuffer(VkDeviceSize size)
+{
+    m_stagingBuffer = std::make_unique<WYVKBuffer>(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, *m_device);
+}
+
 void WYVKRenderer::createSyncObjects()
 {
     m_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -214,6 +230,9 @@ void WYVKRenderer::createSyncObjects()
             throw std::runtime_error("Failed to create synchronization objects for a frame!");
         }
     }
+
+    // Create fence for transfer operations
+    VK_CALL(vkCreateFence(m_device->getLogicalDevice(), &fenceInfo, nullptr, &m_transferFence), "Unable to create transfer fence!");
 }
 
 void WYVKRenderer::recreateSyncObjects()

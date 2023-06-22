@@ -11,11 +11,9 @@ public:
 	WYVKCommandBuffer(WYVKDevice& device, WYVKCommandPool& commandPool, VkCommandBufferLevel level, uint32_t count);
 	void destroy();
 
-	void startRecording();
+	void startRecording(VkCommandBufferUsageFlags flags);
 	void stopRecording();
 	void reset();
-
-	void submit();
 
 	inline VkCommandBuffer* getCommandBuffer() { return &m_commandBuffer; }
 
