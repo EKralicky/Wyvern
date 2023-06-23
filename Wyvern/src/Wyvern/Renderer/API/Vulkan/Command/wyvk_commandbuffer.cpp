@@ -18,6 +18,11 @@ WYVKCommandBuffer::WYVKCommandBuffer(WYVKDevice& device, WYVKCommandPool& comman
 	VK_CALL(vkAllocateCommandBuffers(m_device.getLogicalDevice(), &allocInfo, &m_commandBuffer), "Failed to allocate command buffers!");
 }
 
+WYVKCommandBuffer::~WYVKCommandBuffer()
+{
+	destroy();
+}
+
 void WYVKCommandBuffer::destroy()
 {
 	vkFreeCommandBuffers(m_device.getLogicalDevice(), m_commandPool.getCommandPool(), 1, &m_commandBuffer);

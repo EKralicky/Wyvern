@@ -33,7 +33,7 @@ public:
 	};
 
 	WYVKGraphicsPipeline(WYVKDevice& device, WYVKSwapchain& swapchain, WYVKRenderPass& renderPass);
-	void destroy();
+	~WYVKGraphicsPipeline();
 
 	void createGraphicsPipeline();
 

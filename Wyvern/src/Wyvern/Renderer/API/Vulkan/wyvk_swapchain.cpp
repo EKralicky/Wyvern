@@ -12,6 +12,11 @@ WYVKSwapchain::WYVKSwapchain(WYVKInstance& instance, WYVKDevice& device, WYVKSur
 
 }
 
+WYVKSwapchain::~WYVKSwapchain()
+{
+	destroy();
+}
+
 void WYVKSwapchain::destroy()
 {
 	for (auto framebuffer : m_swapChainFramebuffers) {

@@ -17,7 +17,7 @@ WYVKCommandPool::WYVKCommandPool(WYVKDevice& device)
 	VK_CALL(vkCreateCommandPool(m_device.getLogicalDevice(), &poolInfo, nullptr, &m_commandPool), "Failed to create command pool!");
 }
 
-void WYVKCommandPool::destroy()
+WYVKCommandPool::~WYVKCommandPool()
 {
 	vkDestroyCommandPool(m_device.getLogicalDevice(), m_commandPool, nullptr);
 }

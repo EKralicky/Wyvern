@@ -15,7 +15,7 @@ Window::Window(const char* title)
 	glfwSetFramebufferSizeCallback(m_nativeWindow, Window::framebufferResizeCallback);
 }
 
-void Window::destroy()
+Window::~Window()
 {
 	glfwDestroyWindow(m_nativeWindow);
 	glfwTerminate();

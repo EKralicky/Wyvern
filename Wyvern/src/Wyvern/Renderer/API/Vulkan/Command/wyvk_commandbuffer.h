@@ -9,6 +9,7 @@ class WYVKCommandBuffer
 {
 public:
 	WYVKCommandBuffer(WYVKDevice& device, WYVKCommandPool& commandPool, VkCommandBufferLevel level, uint32_t count);
+	~WYVKCommandBuffer();
 	void destroy();
 
 	void startRecording(VkCommandBufferUsageFlags flags);

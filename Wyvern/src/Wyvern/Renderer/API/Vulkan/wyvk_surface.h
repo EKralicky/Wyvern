@@ -24,7 +24,7 @@ public:
 
 public:
 	WYVKSurface(WYVKInstance& instance, WYVKDevice& device, Window& window);
-	void destroy();
+	~WYVKSurface();
 
 	void createGLFWSurface();
 	void createWin32Surface();
@@ -34,7 +34,7 @@ public:
 	inline SurfaceSupportDetails& getSupportDetails() { return m_supportDetails; }
 
 private:
-	VkSurfaceKHR m_surface;
+	VkSurfaceKHR m_surface = VK_NULL_HANDLE;
 	SurfaceSupportDetails m_supportDetails; // maybe make this into a unique ptr later on
 
 	// Handles

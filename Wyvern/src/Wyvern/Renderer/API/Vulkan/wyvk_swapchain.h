@@ -20,6 +20,7 @@ class WYVKSwapchain
 {
 public:
     WYVKSwapchain(WYVKInstance& instance, WYVKDevice& device, WYVKSurface& surface, Window& window);
+    ~WYVKSwapchain();
     void destroy();
 
     void validateSwapchainSupport();

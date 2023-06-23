@@ -8,7 +8,7 @@ Wyvern::WYVKShader::WYVKShader(WYVKDevice& device, std::filesystem::path& filePa
 {
 }
 
-void Wyvern::WYVKShader::destroy()
+Wyvern::WYVKShader::~WYVKShader()
 {
 }
 

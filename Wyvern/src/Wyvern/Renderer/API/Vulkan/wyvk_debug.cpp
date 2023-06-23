@@ -3,34 +3,36 @@
 namespace Wyvern {
 
 WYVKMessenger::WYVKMessenger(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+    : m_instance(instance)
 {
     if (!ENABLE_VALIDATION_LAYERS) return;
-    if (createDebugMessengerEXT(instance, &createInfo, nullptr) != VK_SUCCESS) {
+    if (createDebugMessengerEXT(&createInfo, nullptr) != VK_SUCCESS) {
         throw std::runtime_error("failed to set up debug messenger!");
     }
 }
 
-void WYVKMessenger::destroy(VkInstance instance, const VkAllocationCallbacks* pAllocator)
+WYVKMessenger::~WYVKMessenger()
 {
-    destroyDebugMessengerEXT(instance, m_debugMessenger, pAllocator);
+    WYVERN_LOG_INFO("Destroying Debug Messenger...");
+    destroyDebugMessengerEXT(m_debugMessenger, nullptr);
 }
 
-VkResult WYVKMessenger::createDebugMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator)
+VkResult WYVKMessenger::createDebugMessengerEXT(const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator)
 {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
     if (func != nullptr) {
-        return func(instance, pCreateInfo, pAllocator, &m_debugMessenger);
+        return func(m_instance, pCreateInfo, pAllocator, &m_debugMessenger);
     }
     else {
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 }
 
-void WYVKMessenger::destroyDebugMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
+void WYVKMessenger::destroyDebugMessengerEXT(VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
 {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr) {
-        func(instance, m_debugMessenger, pAllocator);
+        func(m_instance, m_debugMessenger, pAllocator);
     }
 }
 

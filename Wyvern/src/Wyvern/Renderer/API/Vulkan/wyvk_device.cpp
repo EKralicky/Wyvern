@@ -16,11 +16,11 @@ WYVKDevice::WYVKDevice(WYVKInstance& instance)
 * Destroys the logical device. The physical device does not need to be destroyed as it is considered
 * to be implicitly created and destroyed by the vkInstance
 */
-void WYVKDevice::destroy()
+WYVKDevice::~WYVKDevice()
 {
+    WYVERN_LOG_INFO("Destroying Logical Device...");
     vkDestroyDevice(m_logicalDevice, nullptr);
 }
-
 
 void WYVKDevice::createPhysicalDevice() {
     // Retrieve valid physical devices from the system

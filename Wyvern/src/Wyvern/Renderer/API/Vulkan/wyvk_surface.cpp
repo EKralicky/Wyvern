@@ -14,17 +14,24 @@ namespace Wyvern {
 WYVKSurface::WYVKSurface(WYVKInstance& instance, WYVKDevice& device, Window& window)
 	: m_instance(instance), m_device(device), m_window(window)
 {
-	createWin32Surface();
+
+#ifdef USING_GLFW_SURFACE
+	// Support for multiple platforms
 	createGLFWSurface();
+#else
+	// Using Win32
+	createWin32Surface();
+#endif
 	querySupportDetails();
 }
 
 /*
-	Destroying a VkSurfaceKHR merely severs the connection between Vulkan and the native surface, 
+	Destroying a VkSurfaceKHR merely severs the connection between Vulkan and the native surface,
 	and does not imply destroying the native surface, closing a window, or similar behavior.
 */
-void WYVKSurface::destroy()
+WYVKSurface::~WYVKSurface()
 {
+	::Wyvern::Logger::getConsoleLogger()->info("Destroying Surface...");
 	vkDestroySurfaceKHR(m_instance.getInstance(), m_surface, nullptr);
 }
 

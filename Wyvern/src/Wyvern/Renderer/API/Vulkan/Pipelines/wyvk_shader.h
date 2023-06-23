@@ -9,7 +9,7 @@ class WYVKShader
 {
 public:
 	WYVKShader(WYVKDevice& device, std::filesystem::path& filePath, VkShaderStageFlagBits shaderStage);
-	void destroy();
+	~WYVKShader();
 
 	void compile();
 	VkShaderModule createShaderModule(const std::vector<uint32_t>& code);

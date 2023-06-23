@@ -19,8 +19,6 @@ Application::Application()
 
 Application::~Application()
 {
-	m_renderer->destroy();
-	m_window->destroy();
 }
 
 void Application::run()

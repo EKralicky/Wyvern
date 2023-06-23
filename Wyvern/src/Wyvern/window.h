@@ -11,7 +11,7 @@ class Window
 public:
 
 	Window(const char* title);
-	void destroy();
+	~Window();
 
 	inline GLFWwindow* getNativeWindow() const { return m_nativeWindow; }
 	inline bool isFramebufferResized() const { return m_framebufferResized; }

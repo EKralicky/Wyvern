@@ -9,7 +9,7 @@ class WYVKInstance
 {
 public:
 	WYVKInstance();
-	void destroy();
+	~WYVKInstance();
 
 	bool checkValidationLayerSupport(const std::vector<const char*>& validationLayers);
 	void getRequiredExtensions(std::vector<const char*>& extensions);

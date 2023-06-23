@@ -9,7 +9,7 @@ class WYVKRenderPass
 {
 public:
 	WYVKRenderPass(WYVKSwapchain& swapchain, WYVKDevice& device);
-	void destroy();
+	~WYVKRenderPass();
 
 	void createRenderPass();
 	//VkAttachmentDescription createAttachment();

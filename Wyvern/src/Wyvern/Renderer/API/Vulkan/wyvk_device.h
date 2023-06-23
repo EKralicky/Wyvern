@@ -21,7 +21,7 @@ public:
 
 public:
 	WYVKDevice(WYVKInstance& instance);
-	void destroy();
+	~WYVKDevice();
 
 	void createPhysicalDevice();
 	void createLogicalDevice();

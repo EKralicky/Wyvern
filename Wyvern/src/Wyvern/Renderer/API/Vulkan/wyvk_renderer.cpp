@@ -30,25 +30,17 @@ WYVKRenderer::WYVKRenderer(Window& window)
     createCommandBuffers();
 }
 
-void WYVKRenderer::destroy()
+WYVKRenderer::~WYVKRenderer()
 {
+    WYVERN_LOG_INFO("Destroying Renderer...");
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         vkDestroySemaphore(m_device->getLogicalDevice(), m_renderFinishedSemaphores[i], nullptr);
         vkDestroySemaphore(m_device->getLogicalDevice(), m_imageAvailableSemaphores[i], nullptr);
         vkDestroyFence(m_device->getLogicalDevice(), m_inFlightFences[i], nullptr);
     }
-
-    for (size_t i = 0; i < m_commandBuffers.size(); i++) {
-        m_commandBuffers[i]->destroy();
-    }
-
-    m_commandPool->destroy();
-    m_graphicsPipeline->destroy();
-    m_renderPass->destroy();
-    m_swapchain->destroy();
-    m_device->destroy();
-    m_surface->destroy();
+    vkDestroyFence(m_device->getLogicalDevice(), m_transferFence, nullptr);
 }
+
 
 void WYVKRenderer::createCommandBuffers()
 {

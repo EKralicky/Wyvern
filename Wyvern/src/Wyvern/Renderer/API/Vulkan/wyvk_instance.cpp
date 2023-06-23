@@ -48,12 +48,10 @@ Wyvern::WYVKInstance::WYVKInstance()
     m_debugMessenger = std::make_unique<WYVKMessenger>(m_instance, messengerCreateInfo);
 }
 
-void Wyvern::WYVKInstance::destroy()
+Wyvern::WYVKInstance::~WYVKInstance()
 {
-    if (ENABLE_VALIDATION_LAYERS) {
-        m_debugMessenger->destroy(m_instance, nullptr);
-        m_debugMessenger.reset();
-    }
+    m_debugMessenger.reset();
+    WYVERN_LOG_INFO("Destroying Instance...");
     vkDestroyInstance(m_instance, nullptr);
 }
 

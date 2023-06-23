@@ -47,7 +47,7 @@ void WYVKBuffer::freeMemory()
     vkFreeMemory(m_device.getLogicalDevice(), m_bufferMemory, nullptr);
 }
 
-void WYVKBuffer::copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool commandPool)
+void WYVKBuffer::copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool& commandPool)
 {
     WYVKCommandBuffer cmdBuffer(m_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
     cmdBuffer.startRecording(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -69,7 +69,7 @@ void WYVKBuffer::copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool command
     vkQueueWaitIdle(m_device.getGraphicsQueue());
 }
 
-void WYVKBuffer::copyTo(WYVKBuffer& dst, VkDeviceSize size, WYVKCommandPool commandPool)
+void WYVKBuffer::copyTo(WYVKBuffer& dst, VkDeviceSize size, WYVKCommandPool& commandPool)
 {
     copyTo(dst.getBuffer(), size, commandPool);
 }

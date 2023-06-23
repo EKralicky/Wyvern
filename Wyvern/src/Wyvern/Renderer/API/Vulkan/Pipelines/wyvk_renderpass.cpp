@@ -8,7 +8,7 @@ WYVKRenderPass::WYVKRenderPass(WYVKSwapchain& swapchain, WYVKDevice& device)
 {
 }
 
-void WYVKRenderPass::destroy()
+WYVKRenderPass::~WYVKRenderPass()
 {
 	vkDestroyRenderPass(m_device.getLogicalDevice(), m_renderPass, nullptr);
 }

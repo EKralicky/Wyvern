@@ -14,7 +14,7 @@ WYVKGraphicsPipeline::WYVKGraphicsPipeline(WYVKDevice& device, WYVKSwapchain& sw
 {
 }
 
-void WYVKGraphicsPipeline::destroy()
+WYVKGraphicsPipeline::~WYVKGraphicsPipeline()
 {
     vkDestroyPipeline(m_device.getLogicalDevice(), m_graphicsPipeline, nullptr);
     vkDestroyPipelineLayout(m_device.getLogicalDevice(), m_pipelineLayout, nullptr);

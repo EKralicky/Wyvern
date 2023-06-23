@@ -8,7 +8,7 @@ class WYVKCommandPool
 {
 public:
 	WYVKCommandPool(WYVKDevice& device);
-	void destroy();
+	~WYVKCommandPool();
 
 	VkCommandPool getCommandPool() { return m_commandPool; }
 

@@ -19,13 +19,16 @@ public:
 	}
 	
 	WYVKMessenger(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT& createInfo);
-	void destroy(VkInstance instance, const VkAllocationCallbacks* pAllocator);
+	~WYVKMessenger();
 
 private:
-	VkResult createDebugMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator);
-	void destroyDebugMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
+	VkResult createDebugMessengerEXT(const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator);
+	void destroyDebugMessengerEXT(VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
-	VkDebugUtilsMessengerEXT m_debugMessenger;
+	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
+
+	// Handles
+	VkInstance m_instance;
 
 };
 
