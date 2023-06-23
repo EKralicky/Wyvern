@@ -196,7 +196,6 @@ std::unique_ptr<WYVKBuffer> WYVKRenderer::createVertexBuffer(void* data, VkDevic
 {
     std::unique_ptr<WYVKBuffer> vertexBuffer = std::make_unique<WYVKBuffer>(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, *m_device);
 
-    m_stagingBuffer->freeMemory();
     m_stagingBuffer->assignMemory(data);
     m_stagingBuffer->copyTo(*vertexBuffer, size, *m_commandPool);
 

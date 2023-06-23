@@ -29,8 +29,8 @@ private:
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     VkDeviceSize m_size;
-    VkBuffer m_buffer;
-    VkDeviceMemory m_bufferMemory;
+    VkBuffer m_buffer = VK_NULL_HANDLE;
+    VkDeviceMemory m_bufferMemory = VK_NULL_HANDLE;
 
     // Handles
     WYVKDevice& m_device;
