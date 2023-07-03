@@ -33,12 +33,7 @@ WYVKRenderer::WYVKRenderer(Window& window)
 WYVKRenderer::~WYVKRenderer()
 {
     WYVERN_LOG_INFO("Destroying Renderer...");
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vkDestroySemaphore(m_device->getLogicalDevice(), m_renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(m_device->getLogicalDevice(), m_imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(m_device->getLogicalDevice(), m_inFlightFences[i], nullptr);
-    }
-    vkDestroyFence(m_device->getLogicalDevice(), m_transferFence, nullptr);
+    destroySyncObjects();
 }
 
 
@@ -53,9 +48,7 @@ void WYVKRenderer::createCommandBuffers()
 
 void WYVKRenderer::recreateCommandBuffers()
 {
-    for (size_t i = 0; i < m_commandBuffers.size(); i++) {
-        m_commandBuffers[i]->destroy();
-    }
+    m_commandBuffers.clear();
     createCommandBuffers();
 }
 
@@ -189,7 +182,7 @@ std::unique_ptr<WYVKBuffer> WYVKRenderer::createVertexBuffer(void* data, VkDevic
     std::unique_ptr<WYVKBuffer> vertexBuffer = std::make_unique<WYVKBuffer>(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, *m_device);
 
     m_stagingBuffer->assignMemory(data);
-    m_stagingBuffer->copyTo(*vertexBuffer, size, *m_commandPool);
+    m_stagingBuffer->copyTo(*vertexBuffer, size, *m_commandPool, m_transferFence);
 
     return vertexBuffer;
 }
@@ -197,6 +190,16 @@ std::unique_ptr<WYVKBuffer> WYVKRenderer::createVertexBuffer(void* data, VkDevic
 void WYVKRenderer::allocateStagingBuffer(VkDeviceSize size)
 {
     m_stagingBuffer = std::make_unique<WYVKBuffer>(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, *m_device);
+}
+
+void WYVKRenderer::destroySyncObjects()
+{
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(m_device->getLogicalDevice(), m_renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(m_device->getLogicalDevice(), m_imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(m_device->getLogicalDevice(), m_inFlightFences[i], nullptr);
+    }
+    vkDestroyFence(m_device->getLogicalDevice(), m_transferFence, nullptr);
 }
 
 void WYVKRenderer::createSyncObjects()
@@ -228,11 +231,7 @@ void WYVKRenderer::createSyncObjects()
 
 void WYVKRenderer::recreateSyncObjects()
 {
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vkDestroySemaphore(m_device->getLogicalDevice(), m_renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(m_device->getLogicalDevice(), m_imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(m_device->getLogicalDevice(), m_inFlightFences[i], nullptr);
-    }
+    destroySyncObjects();
     createSyncObjects();
 }
 

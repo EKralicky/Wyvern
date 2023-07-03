@@ -5,8 +5,7 @@ namespace Wyvern {
 
 struct Vertex {
 	glm::vec2 pos;
-	glm::vec3 color;
-
+ 
 	static VkVertexInputBindingDescription getBindingDescription() {
 		VkVertexInputBindingDescription bindingDescription{};
 		// Index of the vertex binding in the array of bindings

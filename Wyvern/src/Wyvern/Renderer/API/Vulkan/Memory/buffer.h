@@ -19,8 +19,8 @@ public:
     inline VkBuffer& getBuffer() { return m_buffer; }
     // Copies buffer contents from src to dst. This function is mainly used for copying info from
     // a staging buffer to a vertex buffer or other buffer
-    void copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool& commandPool);
-    void copyTo(WYVKBuffer& dst, VkDeviceSize size, WYVKCommandPool& commandPool);
+    void copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool& commandPool, VkFence transferFence);
+    void copyTo(WYVKBuffer& dst, VkDeviceSize size, WYVKCommandPool& commandPool, VkFence transferFence);
 
     void assignMemory(void* srcData);
     void freeMemory();

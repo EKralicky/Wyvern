@@ -47,7 +47,7 @@ void WYVKBuffer::freeMemory()
     vkFreeMemory(m_device.getLogicalDevice(), m_bufferMemory, nullptr);
 }
 
-void WYVKBuffer::copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool& commandPool)
+void WYVKBuffer::copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool& commandPool, VkFence transferFence)
 {
     WYVKCommandBuffer cmdBuffer(m_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
     cmdBuffer.startRecording(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -65,13 +65,16 @@ void WYVKBuffer::copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool& comman
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = cmdBuffer.getCommandBuffer();
 
-    vkQueueSubmit(m_device.getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(m_device.getGraphicsQueue());
+    vkQueueSubmit(m_device.getGraphicsQueue(), 1, &submitInfo, transferFence);
+
+    // Waits for tranfer to finish with fence
+    VK_CALL(vkWaitForFences(m_device.getLogicalDevice(), 1, &transferFence, VK_TRUE, UINT64_MAX), "Failed to wait for transfer fence!");
+    VK_CALL(vkResetFences(m_device.getLogicalDevice(), 1, &transferFence), "Failed to reset transfer fence!");
 }
 
-void WYVKBuffer::copyTo(WYVKBuffer& dst, VkDeviceSize size, WYVKCommandPool& commandPool)
+void WYVKBuffer::copyTo(WYVKBuffer& dst, VkDeviceSize size, WYVKCommandPool& commandPool, VkFence transferFence)
 {
-    copyTo(dst.getBuffer(), size, commandPool);
+    copyTo(dst.getBuffer(), size, commandPool, transferFence);
 }
 
 uint32_t WYVKBuffer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)

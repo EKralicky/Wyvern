@@ -92,8 +92,6 @@ void Application::drawFrame(VkBuffer* buffers, VkDeviceSize* offsets, uint32_t c
 
 void Application::mainLoop()
 {
-
-
 	const std::vector<Vertex> vertices = {
 		{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
 		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
@@ -101,7 +99,8 @@ void Application::mainLoop()
 	};
 
 	size_t vSize = sizeof(vertices[0]) * vertices.size();
-	m_renderer->allocateStagingBuffer(vSize);
+	m_renderer->allocateStagingBuffer(vSize); // One time allocation of staging buffer
+
 	std::unique_ptr<WYVKBuffer> vertexBuffer = m_renderer->createVertexBuffer((void*)vertices.data(), vSize);
 
 	VkBuffer vertexBuffers[] = { vertexBuffer->getBuffer() };
