@@ -3,8 +3,10 @@
 
 namespace Wyvern {
 
-struct Vertex {
+struct Vertex 
+{
 	glm::vec2 pos;
+	glm::vec3 color;
  
 	static VkVertexInputBindingDescription getBindingDescription() {
 		VkVertexInputBindingDescription bindingDescription{};
@@ -17,7 +19,6 @@ struct Vertex {
 		bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		return bindingDescription;
 	}
-
 	static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
 		std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
 

@@ -7,6 +7,7 @@
 #include "Core.h"
 #include "window.h"
 #include "Wyvern/Renderer/API/Vulkan/wyvk_renderer.h"
+#include "Renderer/API/Vulkan/Geometry/Model.h"
 
 namespace Wyvern {
 
@@ -29,7 +30,7 @@ public:
     ~Application();
         
     void run();
-    void drawFrame(VkBuffer* buffers, VkDeviceSize* offsets, uint32_t count, uint32_t vertexCount);
+    void drawFrame(std::vector<Model>& models, bool drawIndexed);
 
 private:
     uint32_t m_currentFrame = 0;

@@ -81,7 +81,7 @@ void WYVKRenderer::setDynamicPipelineStates(WYVKCommandBuffer* commandBuffer, Vk
     vkCmdSetScissor(*commandBuffer->getCommandBuffer(), 0, 1, &scissor);
 }
 
-void WYVKRenderer::draw(WYVKCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
+void WYVKRenderer::draw(WYVKCommandBuffer* commandBuffer, size_t vertexCount, size_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
     vkCmdDraw(*commandBuffer->getCommandBuffer(), vertexCount, instanceCount, firstVertex, firstInstance);
 }
@@ -177,14 +177,24 @@ void WYVKRenderer::present(uint32_t currentFrame, uint32_t imageIndex)
     }
 }
 
-std::unique_ptr<WYVKBuffer> WYVKRenderer::createVertexBuffer(void* data, VkDeviceSize size)
+WYVKBuffer* WYVKRenderer::createVertexBuffer(void* data, const VkDeviceSize size)
 {
-    std::unique_ptr<WYVKBuffer> vertexBuffer = std::make_unique<WYVKBuffer>(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, *m_device);
+    WYVKBuffer* vertexBuffer = new WYVKBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, *m_device);
 
     m_stagingBuffer->assignMemory(data);
     m_stagingBuffer->copyTo(*vertexBuffer, size, *m_commandPool, m_transferFence);
 
     return vertexBuffer;
+}
+
+WYVKBuffer* WYVKRenderer::createIndexBuffer(void* data, const VkDeviceSize size)
+{
+    WYVKBuffer* indexBuffer = new WYVKBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, *m_device);
+
+    m_stagingBuffer->assignMemory(data);
+    m_stagingBuffer->copyTo(*indexBuffer, size, *m_commandPool, m_transferFence);
+
+    return indexBuffer;
 }
 
 void WYVKRenderer::allocateStagingBuffer(VkDeviceSize size)

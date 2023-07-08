@@ -26,7 +26,11 @@ void Application::run()
 	mainLoop();
 }
 
-void Application::drawFrame(VkBuffer* buffers, VkDeviceSize* offsets, uint32_t count, uint32_t vertexCount)
+/*
+* TODO: make it so we can draw multiple vertex buffers in one render pass. 
+This will require a restructuring of the params to this function
+*/
+void Application::drawFrame(std::vector<Model>& models, bool drawIndexed)
 {
 	uint32_t imageIndex = 0; // Current swapchain image index we are drawing to
 
@@ -77,13 +81,36 @@ void Application::drawFrame(VkBuffer* buffers, VkDeviceSize* offsets, uint32_t c
 
 	m_renderer->bindPipeline(cmdBuffer);
 
-	vkCmdBindVertexBuffers(*cmdBuffer->getCommandBuffer(), 0, count, buffers, offsets);
+	for (Model& model : models) {
+		/*
+		* Binds the set of vertices you want to draw. vkCmdBindVertexBuffers can be confusing as it is plural, but this is
+		* not used for unique sets of vertices and their attributes. It is used for when you want to structure your vertex buffer attributes such
+		* that each attribute is in a separate buffer. For example if you wanted to store your positions in BufferA and colors in bufferB.
+		* If you want to draw multiple UNIQUE buffers, you would have to make a separate draw call for each unique set of buffers. Like if
+		* you wanted to draw the world and the player model, you would have to bind the world vertices and draw, and then bind the player
+		* model vertices then draw again.
+		*/
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(*cmdBuffer->getCommandBuffer(), 0, model.getVertexBuffersCount(), model.getVertexBuffer(), offsets);
 
-	m_renderer->draw(cmdBuffer, vertexCount, 1, 0, 0);
+		/*
+		* Binds the indices to draw. These indices should be mapped to the currently bound vertices.
+		* The indexType represents the date type for each of the indices.
+		*/
+		vkCmdBindIndexBuffer(*cmdBuffer->getCommandBuffer(), *model.getIndexBuffer(), 0, VK_INDEX_TYPE_UINT16);
+
+
+		if (drawIndexed) {
+			vkCmdDrawIndexed(*cmdBuffer->getCommandBuffer(), static_cast<uint32_t>(model.getIndexCount()), 1, 0, 0, 0);
+		}
+		else {
+			// Draw the vertices to the framebuffer WITHOUT INDEXING!
+			m_renderer->draw(cmdBuffer, model.getVertexSize(), 1, 0, 0);
+		}
+	}
+	
 	m_renderer->endRenderPass(cmdBuffer);
 	cmdBuffer->stopRecording();
-	// RECORDING STOP
-
 	m_renderer->submitCommandBuffer(cmdBuffer, m_currentFrame);
 	m_renderer->present(m_currentFrame, imageIndex);
 
@@ -93,23 +120,41 @@ void Application::drawFrame(VkBuffer* buffers, VkDeviceSize* offsets, uint32_t c
 void Application::mainLoop()
 {
 	const std::vector<Vertex> vertices = {
-		{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-		{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
 	};
 
-	size_t vSize = sizeof(vertices[0]) * vertices.size();
-	m_renderer->allocateStagingBuffer(vSize); // One time allocation of staging buffer
+	const std::vector<uint16_t> indices = {
+		0, 1, 2, 2, 3, 0
+	};
 
-	std::unique_ptr<WYVKBuffer> vertexBuffer = m_renderer->createVertexBuffer((void*)vertices.data(), vSize);
+	// One time allocation of staging buffer
+	m_renderer->allocateStagingBuffer(sizeof(vertices[0]) * vertices.size());
 
-	VkBuffer vertexBuffers[] = { vertexBuffer->getBuffer() };
-	VkDeviceSize offsets[] = { 0 };
+	std::vector<Model> models;
+	models.emplace_back(*m_renderer, vertices, indices);
+
+	//// Get sizes of vertex and index buffers
+	//size_t vSize = sizeof(vertices[0]) * vertices.size();
+	//size_t iSize = sizeof(indices[0]) * indices.size();
+
+	//// One time allocation of staging buffer
+	//m_renderer->allocateStagingBuffer(vSize); 
+
+	//// Create vertex and index buffers
+	//std::unique_ptr<WYVKBuffer> vertexBuffer = m_renderer->createVertexBuffer((void*)vertices.data(), vSize);
+	//std::unique_ptr<WYVKBuffer> indexBuffer = m_renderer->createIndexBuffer((void*)indices.data(), iSize);
+
+
+	/*VkBuffer vertexBuffers[] = { vertexBuffer->getBuffer() };
+	VkDeviceSize offsets[] = { 0 };*/
 
 	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {
 		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
 		
-		drawFrame(vertexBuffers, offsets, 1, static_cast<uint32_t>(vertices.size())); // Uses the render API to draw a single frame
+		drawFrame(models, true); // Uses the render API to draw a single frame
 	}
 	// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
 	VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!"); 

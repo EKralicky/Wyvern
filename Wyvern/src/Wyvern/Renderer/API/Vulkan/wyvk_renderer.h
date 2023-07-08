@@ -41,17 +41,14 @@ public:
     //===================================
     // Command buffer commands
     //===================================
-
-    /*
-    * Command to start the render passa
-    */
     void beginRenderPass(WYVKCommandBuffer* commandBuffer, uint32_t imageIndex, VkClearValue& clearColor);
     void endRenderPass(WYVKCommandBuffer* commandBuffer);
     void bindPipeline(WYVKCommandBuffer* commandBuffer);
     void setDynamicPipelineStates(WYVKCommandBuffer* commandBuffer, VkViewport viewport, VkRect2D scissor);
-    void draw(WYVKCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
+    void draw(WYVKCommandBuffer* commandBuffer, size_t vertexCount, size_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
     void setViewport(WYVKCommandBuffer* commandBuffer, VkViewport& viewport);
     void setScissor(WYVKCommandBuffer* commandBuffer, VkRect2D& scissor);
+    //===================================
     
 
 
@@ -61,8 +58,9 @@ public:
     void submitCommandBuffer(WYVKCommandBuffer* commandBuffer, uint32_t currentFrame);
     void present(uint32_t currentFrame, uint32_t imageIndex);
 
-    std::unique_ptr<WYVKBuffer> createVertexBuffer(void* data, VkDeviceSize size);
     void allocateStagingBuffer(VkDeviceSize size);
+    WYVKBuffer* createVertexBuffer(void* data, VkDeviceSize size);
+    WYVKBuffer* createIndexBuffer(void* data, VkDeviceSize size);
 
     inline std::vector<std::unique_ptr<WYVKCommandBuffer>>& getCommandBuffers() { return m_commandBuffers; }
     inline WYVKSwapchain& getSwapchain() { return *m_swapchain; }

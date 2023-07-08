@@ -69,6 +69,9 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Memory\buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Geometry\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\vk_utility\WYVK.h">
@@ -126,6 +129,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Geometry\vertex_geometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Geometry\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
