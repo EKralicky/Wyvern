@@ -37,6 +37,7 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 	if (m_renderer->acquireNextSwapchainImage(m_currentFrame, currentImage) == false) {
 		m_window->setFramebufferResized(false);
 		m_renderer->recreateSwapchain();
+		return;
 	}
 
 	m_renderer->beginFrameRecording(m_currentFrame, currentImage);
@@ -44,8 +45,11 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 	m_renderer->setupGraphicsPipeline(m_currentFrame);
 	m_renderer->bindPipeline(m_currentFrame);
 
+	m_renderer->updateUniformBuffers(currentImage, uniformData, uniformSize);
+
 	for (Model& model : models) {
 		
+
 		m_renderer->bindVertexBuffers(m_currentFrame, model.getVertexBuffersCount(), model.getVertexBuffer());
 		m_renderer->bindIndexBuffer(m_currentFrame, *model.getIndexBuffer(), VK_INDEX_TYPE_UINT16);
 		m_renderer->bindDescriptorSets(m_currentFrame);
@@ -60,7 +64,6 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 
 	m_renderer->endFrameRecording(m_currentFrame);
 
-	m_renderer->updateUniformBuffers(currentImage, uniformData, uniformSize);
 
 	m_renderer->submitCommandBuffer(m_currentFrame);
 	m_renderer->present(m_currentFrame, currentImage);
@@ -70,14 +73,20 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 void Application::mainLoop()
 {
 	const std::vector<Vertex> vertices = {
-		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-		{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-		{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+		{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+
+		{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}}
 	};
 
 	const std::vector<uint16_t> indices = {
-		0, 1, 2, 2, 3, 0
+		0, 1, 2, 2, 3, 0,
+		4, 5, 6, 6, 7, 4
 	};
 
 	// One time allocation of staging buffer
@@ -85,21 +94,6 @@ void Application::mainLoop()
 
 	std::vector<Model> models;
 	models.emplace_back(*m_renderer, vertices, indices);
-
-	//// Get sizes of vertex and index buffers
-	//size_t vSize = sizeof(vertices[0]) * vertices.size();
-	//size_t iSize = sizeof(indices[0]) * indices.size();
-
-	//// One time allocation of staging buffer
-	//m_renderer->allocateStagingBuffer(vSize); 
-
-	//// Create vertex and index buffers
-	//std::unique_ptr<WYVKBuffer> vertexBuffer = m_renderer->createVertexBuffer((void*)vertices.data(), vSize);
-	//std::unique_ptr<WYVKBuffer> indexBuffer = m_renderer->createIndexBuffer((void*)indices.data(), iSize);
-
-
-	/*VkBuffer vertexBuffers[] = { vertexBuffer->getBuffer() };
-	VkDeviceSize offsets[] = { 0 };*/
 
 	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {
 		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
@@ -110,8 +104,9 @@ void Application::mainLoop()
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
+		//ubo.model = glm::mat4(1);
 		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 		ubo.proj = glm::perspective(glm::radians(45.0f), m_renderer->getSwapchain().getExtent().width / (float)m_renderer->getSwapchain().getExtent().height, 0.1f, 10.0f);
 
 		drawFrame(models, true, (void*) &ubo, sizeof(ubo)); // Uses the render API to draw a single frame

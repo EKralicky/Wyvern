@@ -5,7 +5,7 @@ namespace Wyvern {
 
 struct Vertex 
 {
-	glm::vec2 pos;
+	glm::vec3 pos;
 	glm::vec3 color;
  
 	static VkVertexInputBindingDescription getBindingDescription() {
@@ -34,7 +34,7 @@ struct Vertex
 		//  ivec2: VK_FORMAT_R32G32_SINT, a 2-component vector of 32-bit signed integers
 		//  uvec4: VK_FORMAT_R32G32B32A32_UINT, a 4 - component vector of 32 - bit unsigned integers
 		//  double : VK_FORMAT_R64_SFLOAT
-		attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT; // Type of data for the attribute (byte size)
+		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT; // Type of data for the attribute (byte size)
 		attributeDescriptions[0].offset = offsetof(Vertex, pos); //
 
 		/*

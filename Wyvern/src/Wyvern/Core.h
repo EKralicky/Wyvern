@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <array>
+#include <chrono>
 
 // GLM for math
 #define GLM_FORCE_RADIANS

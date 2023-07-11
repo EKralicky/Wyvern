@@ -37,8 +37,6 @@ WYVKRenderer::WYVKRenderer(Window& window)
     // Create fence for transfer operations
     VkFenceCreateInfo fenceInfo{};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; // Create fence in signaled state so the fence does not block indefinitely before the first frame
-    
     VK_CALL(vkCreateFence(m_device->getLogicalDevice(), &fenceInfo, nullptr, &m_transferFence), "Unable to create transfer fence!");
 }
 
@@ -48,6 +46,9 @@ WYVKRenderer::~WYVKRenderer()
     for (FrameContext& context : m_frameContexts) {
         destroySyncObjects(context);
     }
+    // Make sure to destroy the transfer fence too
+    vkDestroyFence(m_device->getLogicalDevice(), m_transferFence, nullptr);
+
 }
 
 bool WYVKRenderer::acquireNextSwapchainImage(uint32_t currentFrame, uint32_t& currentImage)
@@ -136,8 +137,7 @@ void WYVKRenderer::recreateCommandBuffers()
 
 void WYVKRenderer::updateUniformBuffers(uint32_t currentImage, void* data, size_t size)
 {
-    WYVERN_LOG_INFO(currentImage);
-    memcpy(m_frameContexts[currentImage].cameraMVPBuffer->getPersistentMapping(), &data, size);
+    memcpy(m_frameContexts[currentImage].cameraMVPBuffer->getPersistentMapping(), data, size);
 }
 
 void WYVKRenderer::bindDescriptorSets(uint32_t currentFrame)
@@ -192,10 +192,10 @@ void WYVKRenderer::recreateSwapchain()
     for (FrameContext& context : m_frameContexts) {
         createSyncObjects(context);
     }
-    // Make sure to recreate the transfer fence. Theres probably a better way to do this
+
+    // Make sure to recreate the transfer fence. There's probably a better way to do this
     VkFenceCreateInfo fenceInfo{};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; 
     VK_CALL(vkCreateFence(m_device->getLogicalDevice(), &fenceInfo, nullptr, &m_transferFence), "Unable to create transfer fence!");
 
 }
@@ -245,6 +245,8 @@ void WYVKRenderer::present(uint32_t currentFrame, uint32_t imageIndex)
 
 WYVKBuffer* WYVKRenderer::createVertexBuffer(void* data, const VkDeviceSize size)
 {
+    WYVERN_LOG_INFO("Creating vertex buffer of size {}", size);
+
     WYVKBuffer* vertexBuffer = new WYVKBuffer(*m_device, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     m_stagingBuffer->assignMemory(data);
@@ -261,6 +263,8 @@ void WYVKRenderer::bindVertexBuffers(uint32_t currentFrame, uint32_t vertexBuffe
 
 WYVKBuffer* WYVKRenderer::createIndexBuffer(void* data, const VkDeviceSize size)
 {
+    WYVERN_LOG_INFO("Creating index buffer of size {}", size);
+
     WYVKBuffer* indexBuffer = new WYVKBuffer(*m_device, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     m_stagingBuffer->assignMemory(data);
