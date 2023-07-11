@@ -2,7 +2,7 @@
 
 namespace Wyvern {
 
-WYVKBuffer::WYVKBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, WYVKDevice& device)
+WYVKBuffer::WYVKBuffer(WYVKDevice& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
     : m_device(device),
     m_size(size)
 {
@@ -67,7 +67,7 @@ void WYVKBuffer::copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool& comman
 
     vkQueueSubmit(m_device.getGraphicsQueue(), 1, &submitInfo, transferFence);
 
-    // Waits for tranfer to finish with fence
+    // Waits for transfer to finish with fence
     VK_CALL(vkWaitForFences(m_device.getLogicalDevice(), 1, &transferFence, VK_TRUE, UINT64_MAX), "Failed to wait for transfer fence!");
     VK_CALL(vkResetFences(m_device.getLogicalDevice(), 1, &transferFence), "Failed to reset transfer fence!");
 }
@@ -75,6 +75,11 @@ void WYVKBuffer::copyTo(VkBuffer dst, VkDeviceSize size, WYVKCommandPool& comman
 void WYVKBuffer::copyTo(WYVKBuffer& dst, VkDeviceSize size, WYVKCommandPool& commandPool, VkFence transferFence)
 {
     copyTo(dst.getBuffer(), size, commandPool, transferFence);
+}
+
+void WYVKBuffer::createPersistentMapping()
+{
+    vkMapMemory(m_device.getLogicalDevice(), m_bufferMemory, 0, m_size, 0, &m_mappedMemory);
 }
 
 uint32_t WYVKBuffer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)

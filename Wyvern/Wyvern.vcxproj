@@ -158,6 +158,9 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandbuffer.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandpool.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\CreateInfo\info.cpp" />
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorlayout.cpp" />
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorpool.cpp" />
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorset.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Geometry\Model.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Memory\buffer.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Pipelines\wyvk_graphics_pipeline.cpp" />
@@ -176,6 +179,9 @@
     <ClInclude Include="src\Wyvern\application.h" />
     <ClInclude Include="src\Wyvern\core.h" />
     <ClInclude Include="src\Wyvern\logger.h" />
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorlayout.h" />
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorpool.h" />
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorset.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Geometry\Model.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Memory\buffer.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandbuffer.h" />

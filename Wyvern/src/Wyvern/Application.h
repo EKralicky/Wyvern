@@ -30,14 +30,14 @@ public:
     ~Application();
         
     void run();
-    void drawFrame(std::vector<Model>& models, bool drawIndexed);
+    void drawFrame(std::vector<Model>& models, bool drawIndexed, void* uniformData, size_t uniformSize);
 
 private:
     uint32_t m_currentFrame = 0;
 
     std::unique_ptr<Logger> m_logger;
     std::unique_ptr<Window> m_window;
-    std::unique_ptr<WYVKRenderer>m_renderer;
+    std::unique_ptr<WYVKRenderer> m_renderer;
 
     void initRenderAPI();
     void mainLoop();

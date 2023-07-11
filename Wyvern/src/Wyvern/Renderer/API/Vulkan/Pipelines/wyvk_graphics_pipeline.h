@@ -7,7 +7,6 @@
 
 #include <filesystem>
 
-
 namespace Wyvern {
 
 class WYVKGraphicsPipeline
@@ -35,12 +34,15 @@ public:
 	WYVKGraphicsPipeline(WYVKDevice& device, WYVKSwapchain& swapchain, WYVKRenderPass& renderPass);
 	~WYVKGraphicsPipeline();
 
-	void createGraphicsPipeline();
+	void createGraphicsPipeline(VkDescriptorSetLayout& descriptorSetLayout);
 
 	inline VkPipeline& getPipeline() { return m_graphicsPipeline; }
+	inline VkPipelineLayout& getPipelineLayout() { return m_pipelineLayout; }
 	inline WYVKRenderPass& getWYVKRenderPass() { return m_renderPass; }
 
 private:
+	void createPipelineLayoutInfo(VkDescriptorSetLayout& descriptorSetLayout);
+
 	void initializeDynamicStates(const std::vector<VkDynamicState>& dynamicStates);
 	void initializeDefaultPipelineInfo();
 	void configureShader(std::filesystem::path path, VkShaderStageFlagBits shaderStage);

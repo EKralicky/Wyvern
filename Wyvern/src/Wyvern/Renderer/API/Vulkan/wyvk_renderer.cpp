@@ -1,4 +1,5 @@
 #include "wyvk_renderer.h"
+#include "Descriptor/wyvk_descriptorlayout.h"
 
 namespace Wyvern {
 
@@ -8,7 +9,9 @@ WYVKRenderer::WYVKRenderer(Window& window)
     m_device(std::make_unique<WYVKDevice>(*m_instance)),
     m_surface(std::make_unique<WYVKSurface>(*m_instance, *m_device, window)),
     m_swapchain(std::make_unique<WYVKSwapchain>(*m_instance, *m_device, *m_surface, window))
+    //m_descriptorSetLayout(WYVKDescriptorSetLayout(*m_device, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT))
 {
+    
     // Validate and create swapchain
     m_swapchain->validateSwapchainSupport();
     m_swapchain->createSwapchain();
@@ -17,32 +20,111 @@ WYVKRenderer::WYVKRenderer(Window& window)
     m_renderPass = std::make_unique<WYVKRenderPass>(*m_swapchain, *m_device);
     m_renderPass->createRenderPass();
 
-    // Create graphics pipeline
+    // Create graphics pipeline & render frame contexts (which includes the descriptorsetlayou which is needed in the pipeline)
+    createRenderFrameContexts();
+
     m_graphicsPipeline = std::make_unique<WYVKGraphicsPipeline>(*m_device, *m_swapchain, *m_renderPass);
-    m_graphicsPipeline->createGraphicsPipeline();
+    m_graphicsPipeline->createGraphicsPipeline(m_descriptorSetLayout->getLayout());
 
     // Create framebuffers from swapchain image views
     m_swapchain->createImageViews();
     m_swapchain->createFrameBuffers(m_renderPass->getRenderPass());
 
     m_commandPool = std::make_unique<WYVKCommandPool>(*m_device);
-    createSyncObjects();
+   
     createCommandBuffers();
+
+    // Create fence for transfer operations
+    VkFenceCreateInfo fenceInfo{};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; // Create fence in signaled state so the fence does not block indefinitely before the first frame
+    
+    VK_CALL(vkCreateFence(m_device->getLogicalDevice(), &fenceInfo, nullptr, &m_transferFence), "Unable to create transfer fence!");
 }
 
 WYVKRenderer::~WYVKRenderer()
 {
     WYVERN_LOG_INFO("Destroying Renderer...");
-    destroySyncObjects();
+    for (FrameContext& context : m_frameContexts) {
+        destroySyncObjects(context);
+    }
 }
 
+bool WYVKRenderer::acquireNextSwapchainImage(uint32_t currentFrame, uint32_t& currentImage)
+{
+    // Waits for the In - Flight Fence bound to a specific framebuffer to be signaled. When a fence is signaled, it means the work done previously on the 
+    // framebuffer is complete and we can start to render to that frame buffer.
+    // This is called before we start our rendering sequence so that the CPU stalls before it knows it can start on a new frame.
+    VK_CALL(vkWaitForFences(m_device->getLogicalDevice(), 1, &m_frameContexts[currentFrame].inFlightFence, VK_TRUE, UINT64_MAX), "Failed to wait for fence!");
+    
+    VkResult result = vkAcquireNextImageKHR(m_device->getLogicalDevice(), m_swapchain->getSwapchain(), UINT64_MAX, m_frameContexts[currentFrame].imageAvailableSemaphore, VK_NULL_HANDLE, &currentImage);
+
+    // Returns false if the swapchain is out of date or the window was resized
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || m_window.isFramebufferResized()) {
+        return false;
+    }
+    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        throw std::runtime_error("Failed to acquire swap chain image!");
+    }
+
+    // This call simply changes the state of a fence to be un-signaled. This is done once we know we have an image we can draw to.
+    // If, for example, we un-signaled the fence right after we wait on it and the swapchain needs to be recreated, 
+    // the drawFrame function will exit early, and on the next frame the fence will be waiting for a non existent frame to finish 
+    VK_CALL(vkResetFences(m_device->getLogicalDevice(), 1, &m_frameContexts[currentFrame].inFlightFence), "Failed to reset fence!");
+    return true;
+}
+
+void WYVKRenderer::beginFrameRecording(uint32_t currentFrame, uint32_t currentImage)
+{
+    WYVKCommandBuffer* cmdBuffer = m_frameContexts[currentFrame].commandBuffer.get();
+    cmdBuffer->reset();
+    cmdBuffer->startRecording(0);
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = m_renderPass->getRenderPass();
+    renderPassInfo.framebuffer = m_swapchain->getFrameBuffers()[currentImage];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = m_swapchain->getExtent();
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearColor;
+    vkCmdBeginRenderPass(*cmdBuffer->getCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+}
+
+void WYVKRenderer::endFrameRecording(uint32_t currentFrame)
+{
+    WYVKCommandBuffer* cmdBuffer = m_frameContexts[currentFrame].commandBuffer.get();
+    vkCmdEndRenderPass(*cmdBuffer->getCommandBuffer());
+    cmdBuffer->stopRecording();
+}
+
+void WYVKRenderer::setupGraphicsPipeline(uint32_t currentFrame)
+{
+    // Get swapchain extent
+    VkExtent2D& extent = getSwapchain().getExtent();
+
+    // Set dynamic viewport
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = static_cast<float>(extent.width);
+    viewport.height = static_cast<float>(extent.height);
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    vkCmdSetViewport(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), 0, 1, &viewport);
+
+    // Set dynamic scissor
+    VkRect2D scissor{};
+    scissor.offset = { 0, 0 };
+    scissor.extent = extent;
+    vkCmdSetScissor(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), 0, 1, &scissor);
+}
 
 void WYVKRenderer::createCommandBuffers()
 {
-    m_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        m_commandBuffers[i] = std::make_unique<WYVKCommandBuffer>(*m_device, *m_commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
+    for (FrameContext& context : m_frameContexts) {
+        context.commandBuffer = std::make_unique<WYVKCommandBuffer>(*m_device, *m_commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
     }
 }
 
@@ -52,62 +134,31 @@ void WYVKRenderer::recreateCommandBuffers()
     createCommandBuffers();
 }
 
-void WYVKRenderer::beginRenderPass(WYVKCommandBuffer* commandBuffer, uint32_t imageIndex, VkClearValue& clearColor)
+void WYVKRenderer::updateUniformBuffers(uint32_t currentImage, void* data, size_t size)
 {
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = m_renderPass->getRenderPass();
-    renderPassInfo.framebuffer = m_swapchain->getFrameBuffers()[imageIndex];
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = m_swapchain->getExtent();
-    renderPassInfo.clearValueCount = 1;
-    renderPassInfo.pClearValues = &clearColor;
-    vkCmdBeginRenderPass(*commandBuffer->getCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    WYVERN_LOG_INFO(currentImage);
+    memcpy(m_frameContexts[currentImage].cameraMVPBuffer->getPersistentMapping(), &data, size);
 }
 
-void WYVKRenderer::endRenderPass(WYVKCommandBuffer* commandBuffer)
+void WYVKRenderer::bindDescriptorSets(uint32_t currentFrame)
 {
-    vkCmdEndRenderPass(*commandBuffer->getCommandBuffer());
+    VkDescriptorSet* ds = &m_frameContexts[currentFrame].descriptorSet->getDescriptorSet();
+    vkCmdBindDescriptorSets(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline->getPipelineLayout(), 0, 1, ds, 0, nullptr);
 }
 
-void WYVKRenderer::bindPipeline(WYVKCommandBuffer* commandBuffer)
+void WYVKRenderer::bindPipeline(uint32_t currentFrame)
 {
-    vkCmdBindPipeline(*commandBuffer->getCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline->getPipeline());
+    vkCmdBindPipeline(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline->getPipeline());
 }
 
-void WYVKRenderer::setDynamicPipelineStates(WYVKCommandBuffer* commandBuffer, VkViewport viewport, VkRect2D scissor)
+void WYVKRenderer::draw(uint32_t currentFrame, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
-    vkCmdSetViewport(*commandBuffer->getCommandBuffer(), 0, 1, &viewport);
-    vkCmdSetScissor(*commandBuffer->getCommandBuffer(), 0, 1, &scissor);
+    vkCmdDraw(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), vertexCount, instanceCount, firstVertex, firstInstance);
 }
 
-void WYVKRenderer::draw(WYVKCommandBuffer* commandBuffer, size_t vertexCount, size_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
+void WYVKRenderer::drawIndexed(uint32_t currentFrame, uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance)
 {
-    vkCmdDraw(*commandBuffer->getCommandBuffer(), vertexCount, instanceCount, firstVertex, firstInstance);
-}
-
-void WYVKRenderer::setViewport(WYVKCommandBuffer* commandBuffer, VkViewport& viewport)
-{
-    vkCmdSetViewport(*commandBuffer->getCommandBuffer(), 0, 1, &viewport);
-}
-
-void WYVKRenderer::setScissor(WYVKCommandBuffer* commandBuffer, VkRect2D& scissor)
-{
-    vkCmdSetScissor(*commandBuffer->getCommandBuffer(), 0, 1, &scissor);
-}
-
-/*
-* ok so currently my waitforcences function is waiting on the fence then immediately resetting it. but this basically depends on the last iteration of drawframe.
-* what i think is happening, is that its waiting for the previous frame to finish "vkWaitForFences" then it blocks there. once its finished, the fences get immidiately
-* reset ready for the next frame iteration. but the problem with that and recreating the swapchain is that if we return early and never get to rendering the frame,
-* the vkWaitForFences will hang indefinitely because the fence will never get flagged because theres no work being done. The way to fix this is to delay the fence reset
-* until we know that we have a frame to be rendered. If we can't get the swapchain images then the function will return, but the fence wont be blocked because
-* it was never reset and its still in the flagged state
-*/
-VkResult WYVKRenderer::acquireNextSwapchainImage(uint32_t currentFrame, uint32_t& imageIndex)
-{
-    VkResult result = vkAcquireNextImageKHR(m_device->getLogicalDevice(), m_swapchain->getSwapchain(), UINT64_MAX, m_imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
-    return result;
+    vkCmdDrawIndexed(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 void WYVKRenderer::recreateSwapchain()
@@ -125,31 +176,46 @@ void WYVKRenderer::recreateSwapchain()
     vkDeviceWaitIdle(m_device->getLogicalDevice());
     WYVERN_LOG_INFO("Recreating swapchain");
 
+    // Clean up
     m_swapchain->destroy();
-    
+    for (FrameContext& context : m_frameContexts) {
+        destroySyncObjects(context);
+    }
+    // Make sure to destroy the transfer fence too
+    vkDestroyFence(m_device->getLogicalDevice(), m_transferFence, nullptr);
+
+
+    // Recreate
     m_swapchain->createSwapchain();
     m_swapchain->createImageViews();
     m_swapchain->createFrameBuffers(m_renderPass->getRenderPass());
-    recreateSyncObjects();
-    recreateCommandBuffers();
+    for (FrameContext& context : m_frameContexts) {
+        createSyncObjects(context);
+    }
+    // Make sure to recreate the transfer fence. Theres probably a better way to do this
+    VkFenceCreateInfo fenceInfo{};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; 
+    VK_CALL(vkCreateFence(m_device->getLogicalDevice(), &fenceInfo, nullptr, &m_transferFence), "Unable to create transfer fence!");
+
 }
 
-void WYVKRenderer::submitCommandBuffer(WYVKCommandBuffer* commandBuffer, uint32_t currentFrame)
+void WYVKRenderer::submitCommandBuffer(uint32_t currentFrame)
 {
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
     submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = &m_imageAvailableSemaphores[currentFrame];
+    submitInfo.pWaitSemaphores = &m_frameContexts[currentFrame].imageAvailableSemaphore;
     submitInfo.pWaitDstStageMask = waitStages;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = commandBuffer->getCommandBuffer();
+    submitInfo.pCommandBuffers = m_frameContexts[currentFrame].commandBuffer->getCommandBuffer();
 
     submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = &m_renderFinishedSemaphores[currentFrame];
+    submitInfo.pSignalSemaphores = &m_frameContexts[currentFrame].renderFinishedSemaphore;
 
-    VK_CALL(vkQueueSubmit(m_device->getGraphicsQueue(), 1, &submitInfo, m_inFlightFences[currentFrame]), "Failed to submit command buffer!");
+    VK_CALL(vkQueueSubmit(m_device->getGraphicsQueue(), 1, &submitInfo, m_frameContexts[currentFrame].inFlightFence), "Failed to submit command buffer!");
 }
 
 void WYVKRenderer::present(uint32_t currentFrame, uint32_t imageIndex)
@@ -158,7 +224,7 @@ void WYVKRenderer::present(uint32_t currentFrame, uint32_t imageIndex)
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
     presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores = &m_renderFinishedSemaphores[currentFrame];
+    presentInfo.pWaitSemaphores = &m_frameContexts[currentFrame].renderFinishedSemaphore;
 
     VkSwapchainKHR swapChains[] = { m_swapchain->getSwapchain() };
     presentInfo.swapchainCount = 1;
@@ -179,7 +245,7 @@ void WYVKRenderer::present(uint32_t currentFrame, uint32_t imageIndex)
 
 WYVKBuffer* WYVKRenderer::createVertexBuffer(void* data, const VkDeviceSize size)
 {
-    WYVKBuffer* vertexBuffer = new WYVKBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, *m_device);
+    WYVKBuffer* vertexBuffer = new WYVKBuffer(*m_device, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     m_stagingBuffer->assignMemory(data);
     m_stagingBuffer->copyTo(*vertexBuffer, size, *m_commandPool, m_transferFence);
@@ -187,9 +253,15 @@ WYVKBuffer* WYVKRenderer::createVertexBuffer(void* data, const VkDeviceSize size
     return vertexBuffer;
 }
 
+void WYVKRenderer::bindVertexBuffers(uint32_t currentFrame, uint32_t vertexBuffersCount, VkBuffer* buffers)
+{
+    VkDeviceSize offsets[] = { 0 };
+    vkCmdBindVertexBuffers(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), 0, vertexBuffersCount, buffers, offsets);
+}
+
 WYVKBuffer* WYVKRenderer::createIndexBuffer(void* data, const VkDeviceSize size)
 {
-    WYVKBuffer* indexBuffer = new WYVKBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, *m_device);
+    WYVKBuffer* indexBuffer = new WYVKBuffer(*m_device, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     m_stagingBuffer->assignMemory(data);
     m_stagingBuffer->copyTo(*indexBuffer, size, *m_commandPool, m_transferFence);
@@ -197,27 +269,48 @@ WYVKBuffer* WYVKRenderer::createIndexBuffer(void* data, const VkDeviceSize size)
     return indexBuffer;
 }
 
+void WYVKRenderer::bindIndexBuffer(uint32_t currentFrame, VkBuffer buffer, VkIndexType indexType)
+{
+    vkCmdBindIndexBuffer(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), buffer, 0, indexType);
+}
+
 void WYVKRenderer::allocateStagingBuffer(VkDeviceSize size)
 {
-    m_stagingBuffer = std::make_unique<WYVKBuffer>(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, *m_device);
+    m_stagingBuffer = std::make_unique<WYVKBuffer>(*m_device, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 }
 
-void WYVKRenderer::destroySyncObjects()
+void WYVKRenderer::createRenderFrameContexts()
 {
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vkDestroySemaphore(m_device->getLogicalDevice(), m_renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(m_device->getLogicalDevice(), m_imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(m_device->getLogicalDevice(), m_inFlightFences[i], nullptr);
+    // Create descriptor layout bindings and actual layout object
+    m_descriptorSetLayout = std::make_unique<WYVKDescriptorLayout>(*m_device);
+    m_descriptorSetLayout->addBinding(0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+    m_descriptorSetLayout->createLayout();
+
+    // Create descriptor pool
+    m_descriptorPool = std::make_unique<WYVKDescriptorPool>(*m_device, 10, 10); // create a descriptor pool of 10 descriptors and a max of 10 sets
+
+    m_frameContexts.resize(MAX_FRAMES_IN_FLIGHT + 1);
+
+    for (FrameContext& context : m_frameContexts) {
+        createSyncObjects(context);
+        initDescriptors(context);
     }
-    vkDestroyFence(m_device->getLogicalDevice(), m_transferFence, nullptr);
 }
 
-void WYVKRenderer::createSyncObjects()
+/*
+* VERY IMPORTANT FUNCTION
+*/
+void WYVKRenderer::initDescriptors(FrameContext& context)
 {
-    m_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    m_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    m_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+    context.cameraMVPBuffer = std::make_unique<WYVKBuffer>(*m_device, sizeof(CameraMVPBuffer), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    context.cameraMVPBuffer->createPersistentMapping();
 
+    context.descriptorSet = std::make_unique<WYVKDescriptorSet>(*m_device, *m_descriptorPool, *m_descriptorSetLayout);
+    context.descriptorSet->updateBinding(context.cameraMVPBuffer->getBuffer(), 0, sizeof(CameraMVPBuffer), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);  
+}
+
+void WYVKRenderer::createSyncObjects(FrameContext& context)
+{
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -225,36 +318,20 @@ void WYVKRenderer::createSyncObjects()
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; // Create fence in signaled state so the fence does not block indefinitely before the first frame
 
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        if (vkCreateSemaphore(m_device->getLogicalDevice(), &semaphoreInfo, nullptr, &m_imageAvailableSemaphores[i]) != VK_SUCCESS ||
-            vkCreateSemaphore(m_device->getLogicalDevice(), &semaphoreInfo, nullptr, &m_renderFinishedSemaphores[i]) != VK_SUCCESS ||
-            vkCreateFence(m_device->getLogicalDevice(), &fenceInfo, nullptr, &m_inFlightFences[i]) != VK_SUCCESS)
-        {
-            WYVERN_LOG_ERROR("Failed to create synchronization objects for a frame!");
-            throw std::runtime_error("Failed to create synchronization objects for a frame!");
-        }
+    if (vkCreateSemaphore(m_device->getLogicalDevice(), &semaphoreInfo, nullptr, &context.imageAvailableSemaphore) != VK_SUCCESS ||
+        vkCreateSemaphore(m_device->getLogicalDevice(), &semaphoreInfo, nullptr, &context.renderFinishedSemaphore) != VK_SUCCESS ||
+        vkCreateFence(m_device->getLogicalDevice(), &fenceInfo, nullptr, &context.inFlightFence) != VK_SUCCESS)
+    {
+        WYVERN_LOG_ERROR("Failed to create synchronization objects for a frame!");
+        throw std::runtime_error("Failed to create synchronization objects for a frame!");
     }
-
-    // Create fence for transfer operations
-    VK_CALL(vkCreateFence(m_device->getLogicalDevice(), &fenceInfo, nullptr, &m_transferFence), "Unable to create transfer fence!");
 }
 
-void WYVKRenderer::recreateSyncObjects()
+void WYVKRenderer::destroySyncObjects(FrameContext& context)
 {
-    destroySyncObjects();
-    createSyncObjects();
+    vkDestroySemaphore(m_device->getLogicalDevice(), context.imageAvailableSemaphore, nullptr);
+    vkDestroySemaphore(m_device->getLogicalDevice(), context.renderFinishedSemaphore, nullptr);
+    vkDestroyFence(m_device->getLogicalDevice(), context.inFlightFence, nullptr);
 }
-
-void WYVKRenderer::waitForFences(uint32_t currentFrame)
-{
-    VK_CALL(vkWaitForFences(m_device->getLogicalDevice(), 1, &m_inFlightFences[currentFrame], VK_TRUE, UINT64_MAX), "Failed to wait for fence!");
-}
-
-void WYVKRenderer::resetFences(uint32_t currentFrame)
-{
-    VK_CALL(vkResetFences(m_device->getLogicalDevice(), 1, &m_inFlightFences[currentFrame]), "Failed to reset fence!");
-}
-
-
 
 }

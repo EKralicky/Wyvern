@@ -72,6 +72,15 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Geometry\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorpool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorlayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\vk_utility\WYVK.h">
@@ -132,6 +141,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Geometry\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorpool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorlayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
