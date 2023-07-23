@@ -3,6 +3,7 @@
 #include "wyvk_instance.h"
 #include "wyvk_surface.h"
 #include "wyvk_device.h"
+#include "Memory/image.h"
 
 namespace Wyvern {
 

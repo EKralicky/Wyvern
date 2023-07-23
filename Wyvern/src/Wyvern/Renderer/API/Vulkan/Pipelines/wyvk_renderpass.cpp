@@ -56,7 +56,7 @@ void WYVKRenderPass::createRenderPass()
 	* =============================================S
 	*/
 	VkAttachmentReference colorAttachmentRef{};
-	colorAttachmentRef.attachment = 0; // Index of attachment in attachment list
+	colorAttachmentRef.attachment = 0; // Index of attachment in the pAttachments list in the framebuffer 
 	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL; // Specifies the attachment type this ref is reffering to
 
 	/*
