@@ -20,10 +20,11 @@ namespace Wyvern {
         VkDeviceSize m_size = 0;
         VkDeviceMemory m_deviceMemory = VK_NULL_HANDLE;
         void* m_mappedMemory = nullptr;
+        VkMemoryPropertyFlags m_properties;
+
 
         // Handles
         WYVKDevice& m_device;
-        VkMemoryPropertyFlags& m_properties;
     };
 
 } // namespace Wyvern

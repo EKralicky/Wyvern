@@ -27,12 +27,13 @@ public:
     void validateSwapchainSupport();
     void createSwapchain();
     void createImageViews();
-    void createFrameBuffers(VkRenderPass renderPass);
+    //void createFrameBuffers(VkRenderPass renderPass);
 
     inline VkSwapchainKHR getSwapchain() { return m_swapChain; }
     inline VkExtent2D& getExtent() { return m_extent; }
     inline VkFormat& getImageFormat() { return m_format; }
-    inline std::vector<VkFramebuffer>& getFrameBuffers() { return m_swapChainFramebuffers; }
+    inline std::vector<VkImageView>& getImageViews() { return m_imageViews; }
+    //inline auto& getFrameBuffers() { return m_swapChainFramebuffers; }
 
 private:
     // Basically chooses the best format, present mode, and extent from the available options retrieved from the GLFW window
@@ -40,20 +41,19 @@ private:
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+    VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
+    WYVKSurface::SurfaceSupportDetails m_supportDetails;
+    VkExtent2D m_extent;
+    VkFormat m_format;
+
+    std::vector<VkImage> m_images; // Swapchain images will automatically be cleaned up when the swapchain is destroyed
+    std::vector<VkImageView> m_imageViews;
+
     // Handles
     WYVKInstance& m_instance;
     WYVKSurface& m_surface;
     WYVKDevice& m_device;  
     Window& m_window;
-
-    VkExtent2D m_extent;
-    VkFormat m_format;
-
-    VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
-    WYVKSurface::SurfaceSupportDetails m_supportDetails;
-    std::vector<VkImage> m_swapChainImages; // Swapchain images will automatically be cleaned up when the swapchain is destroyed
-    std::vector<VkImageView> m_swapChainImageViews;
-    std::vector<VkFramebuffer> m_swapChainFramebuffers;
 };
 
 }

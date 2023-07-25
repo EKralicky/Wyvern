@@ -79,7 +79,7 @@ void WYVKGraphicsPipeline::createGraphicsPipeline(VkDescriptorSetLayout& descrip
     pipelineInfo.pViewportState = &m_configInfo.viewportStateInfo;
     pipelineInfo.pRasterizationState = &m_configInfo.rasterizationInfo;
     pipelineInfo.pMultisampleState = &m_configInfo.multisampleInfo;
-    pipelineInfo.pDepthStencilState = nullptr; // Optional
+    pipelineInfo.pDepthStencilState = &m_configInfo.depthStencilInfo; // Optional
     pipelineInfo.pColorBlendState = &m_configInfo.colorBlendInfo;
     pipelineInfo.pDynamicState = &m_configInfo.dynamicStateInfo;
 

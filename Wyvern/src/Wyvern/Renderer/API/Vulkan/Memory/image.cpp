@@ -31,7 +31,7 @@ namespace Wyvern {
         case ImageType::WYVK_DEPTH_IMAGE:
             imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
             imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-            imageInfo.format = findSupportedFormat(DEPTH_STENCIL_FORMATS, imageInfo.tiling, imageInfo.usage);
+            imageInfo.format = findSupportedFormat(DEPTH_STENCIL_FORMATS, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
             break;
 
         case ImageType::WYVK_STENCIL_IMAGE:
@@ -58,64 +58,60 @@ namespace Wyvern {
         // Create Vulkan image
         VK_CALL(vkCreateImage(m_device.getLogicalDevice(), &imageInfo, nullptr, &m_image), "Failed to create image!");
 
-        // Get memory creation requirements
+        // allocate and bind memory
         VkMemoryRequirements memRequirements;
         vkGetImageMemoryRequirements(m_device.getLogicalDevice(), m_image, &memRequirements);
-
-        // Allocates memory on m_deviceMemory. This allocation is done in the base class. 
-        // see WYVKMemoryResource for implementation details
         allocateMemory(memRequirements);
-
-        // Bind the device memory to the image
         vkBindImageMemory(m_device.getLogicalDevice(), m_image, m_deviceMemory, 0);
     }
 
     WYVKImage::~WYVKImage()
     {
+        vkDestroyImageView(m_device.getLogicalDevice(), m_imageView, nullptr);
         vkDestroyImage(m_device.getLogicalDevice(), m_image, nullptr);
     }
 
-    VkFormat WYVKImage::findSupportedFormat(const std::vector<VkFormat>& availableFormats, VkImageTiling& tiling, VkFormatFeatureFlags& features)
+    VkFormat WYVKImage::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) 
     {
-        for (VkFormat format : availableFormats) {
-            // First retrieve format properties which includes linear and optimal tiling features
+        for (VkFormat format : candidates) {
             VkFormatProperties props;
             vkGetPhysicalDeviceFormatProperties(m_device.getPhysicalDevice(), format, &props);
 
-            // If tiling parameter is LINEAR, check if the features we want have linear tiling features
             if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
                 return format;
             }
-            // If tiling parameter is OPTIMAL, check if the features we want have optimal tiling features
             else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
                 return format;
             }
         }
-
-        WYVERN_LOG_ERROR("Unable to find supported image format!");
-        WYVERN_ASSERT(false, "Unable to find supported image format!");
+        
+        WYVERN_LOG_ERROR("Unable to find a supported image format!");
+        WYVERN_ASSERT(false, "Unable to find a supported image format!");
     }
 
-    VkImageView WYVKImage::createImageView(VkImageAspectFlags aspectFlags)
+    void WYVKImage::createImageView(VkImageAspectFlags aspectFlags)
     {
-        VkImageViewCreateInfo viewInfo{};
-        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        viewInfo.image = m_image;
-        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        viewInfo.format = m_format;
-        viewInfo.subresourceRange.aspectMask = aspectFlags;
-        viewInfo.subresourceRange.baseMipLevel = 0;
-        viewInfo.subresourceRange.levelCount = 1;
-        viewInfo.subresourceRange.baseArrayLayer = 0;
-        viewInfo.subresourceRange.layerCount = 1;
+        if (aspectFlags != VK_IMAGE_ASPECT_NONE) {
+            VkImageViewCreateInfo viewInfo{};
+            viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            viewInfo.image = m_image;
+            viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            viewInfo.format = m_format;
+            viewInfo.subresourceRange.aspectMask = aspectFlags;
+            viewInfo.subresourceRange.baseMipLevel = 0;
+            viewInfo.subresourceRange.levelCount = 1;
+            viewInfo.subresourceRange.baseArrayLayer = 0;
+            viewInfo.subresourceRange.layerCount = 1;
 
-        VkImageView imageView;
-        VK_CALL(vkCreateImageView(m_device.getLogicalDevice(), &viewInfo, nullptr, &imageView), "Failed to create image view!");
-
-        return imageView;
+            VK_CALL(vkCreateImageView(m_device.getLogicalDevice(), &viewInfo, nullptr, &m_imageView), "Failed to create image view!");
+        }
+        else {
+            WYVERN_LOG_ERROR("Invalid aspect flag: VK_IMAGE_ASPECT_NONE");
+            throw std::runtime_error("Unsupported aspect flag!");
+        }
+        
     }
 
-    
     bool WYVKImage::hasStencilComponent(VkFormat format)
     {
         return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;

@@ -81,7 +81,10 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorlayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Images\image.cpp">
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Memory\image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Memory\memory_resource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -155,10 +158,10 @@
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorlayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Images\image.h">
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Memory\image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Images\depth_image.h">
+    <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Memory\memory_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

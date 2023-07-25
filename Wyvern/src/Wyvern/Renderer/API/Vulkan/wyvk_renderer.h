@@ -45,7 +45,11 @@ public:
     // "In-Flight" meaning currently being rendered/prepared.
     // Since we are using the mailbox/triple buffering method for rendering we will have at most 2 frames in flight
     static const int MAX_FRAMES_IN_FLIGHT = 2;
-    const VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+
+    const std::array<VkClearValue, 2> clearValues = { {
+        {0.0f, 0.0f, 0.0f, 1.0f}, // Clear value for color attachment (red, green, blue, alpha)
+        {1.0f, 0}                // Clear value for depth-stencil attachment. First param is far plane distance
+    } };
 
     WYVKRenderer(Window& window);
     ~WYVKRenderer();
@@ -213,9 +217,6 @@ private:
     void initDescriptors(FrameContext& context);
 
     void createRenderFrameContexts();
-
-
-
 
     std::unique_ptr<WYVKInstance> m_instance;
     std::unique_ptr<WYVKDevice> m_device;

@@ -19,10 +19,7 @@ WYVKSwapchain::~WYVKSwapchain()
 
 void WYVKSwapchain::destroy()
 {
-	for (auto framebuffer : m_swapChainFramebuffers) {
-		vkDestroyFramebuffer(m_device.getLogicalDevice(), framebuffer, nullptr);
-	}
-	for (auto imageView : m_swapChainImageViews) {
+	for (auto imageView : m_imageViews) {
 		vkDestroyImageView(m_device.getLogicalDevice(), imageView, nullptr);
 	}
 	vkDestroySwapchainKHR(m_device.getLogicalDevice(), m_swapChain, nullptr);
@@ -92,17 +89,17 @@ void WYVKSwapchain::createSwapchain()
 
 	// Retrieve handles to swapchain images
 	vkGetSwapchainImagesKHR(m_device.getLogicalDevice(), m_swapChain, &imageCount, nullptr);
-	m_swapChainImages.resize(imageCount);
-	vkGetSwapchainImagesKHR(m_device.getLogicalDevice(), m_swapChain, &imageCount, m_swapChainImages.data());
+	m_images.resize(imageCount);
+	vkGetSwapchainImagesKHR(m_device.getLogicalDevice(), m_swapChain, &imageCount, m_images.data());
 }
 
 void WYVKSwapchain::createImageViews()
 {
-	m_swapChainImageViews.resize(m_swapChainImages.size());
-	for (size_t i = 0; i < m_swapChainImages.size(); i++) {
+	m_imageViews.resize(m_images.size());
+	for (size_t i = 0; i < m_images.size(); i++) {
 		VkImageViewCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		createInfo.image = m_swapChainImages[i];
+		createInfo.image = m_images[i];
 		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D; // Texture type: 1D, 2D, or 3D
 		createInfo.format = m_format;
 		// Color mapping
@@ -117,31 +114,31 @@ void WYVKSwapchain::createImageViews()
 		createInfo.subresourceRange.baseArrayLayer = 0;
 		createInfo.subresourceRange.layerCount = 1;
 
-		VK_CALL(vkCreateImageView(m_device.getLogicalDevice(), &createInfo, nullptr, &m_swapChainImageViews[i]), "Unable to create image view! Index: " + std::to_string(i))
+		VK_CALL(vkCreateImageView(m_device.getLogicalDevice(), &createInfo, nullptr, &m_imageViews[i]), "Unable to create image view! Index: " + std::to_string(i))
 	}
 }
 
-void WYVKSwapchain::createFrameBuffers(VkRenderPass renderPass)
-{
-	m_swapChainFramebuffers.resize(m_swapChainImageViews.size());
-
-	for (size_t i = 0; i < m_swapChainImageViews.size(); i++) {
-		VkImageView attachments[] = {
-			m_swapChainImageViews[i]
-		};
-
-		VkFramebufferCreateInfo framebufferInfo{};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderPass;
-		framebufferInfo.attachmentCount = 1;
-		framebufferInfo.pAttachments = attachments;
-		framebufferInfo.width = m_extent.width;
-		framebufferInfo.height = m_extent.height;
-		framebufferInfo.layers = 1;
-
-		VK_CALL(vkCreateFramebuffer(m_device.getLogicalDevice(), &framebufferInfo, nullptr, &m_swapChainFramebuffers[i]), "Failed to create framebuffer!");
-	}
-}
+//void WYVKSwapchain::createFrameBuffers(VkRenderPass renderPass)
+//{
+//	m_swapChainFramebuffers.resize(m_swapChainImageViews.size());
+//
+//	for (size_t i = 0; i < m_swapChainImageViews.size(); i++) {
+//		VkImageView attachments[] = {
+//			m_swapChainImageViews[i]
+//		};
+//
+//		VkFramebufferCreateInfo framebufferInfo{};
+//		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+//		framebufferInfo.renderPass = renderPass;
+//		framebufferInfo.attachmentCount = 1;
+//		framebufferInfo.pAttachments = attachments;
+//		framebufferInfo.width = m_extent.width;
+//		framebufferInfo.height = m_extent.height;
+//		framebufferInfo.layers = 1;
+//
+//		VK_CALL(vkCreateFramebuffer(m_device.getLogicalDevice(), &framebufferInfo, nullptr, &m_swapChainFramebuffers[i]), "Failed to create framebuffer!");
+//	}
+//}
 
 /* https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain 
 * Each VkSurfaceFormatKHR entry contains a format and a colorSpace member. The format member specifies the color channels and types. 

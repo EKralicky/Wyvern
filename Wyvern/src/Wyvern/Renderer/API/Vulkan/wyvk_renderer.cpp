@@ -3,6 +3,7 @@
 
 namespace Wyvern {
 
+
 WYVKRenderer::WYVKRenderer(Window& window)
     : m_window(window),
     m_instance(std::make_unique<WYVKInstance>()),
@@ -11,27 +12,25 @@ WYVKRenderer::WYVKRenderer(Window& window)
     m_swapchain(std::make_unique<WYVKSwapchain>(*m_instance, *m_device, *m_surface, window))
     //m_descriptorSetLayout(WYVKDescriptorSetLayout(*m_device, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT))
 {
-    
+
     // Validate and create swapchain
     m_swapchain->validateSwapchainSupport();
     m_swapchain->createSwapchain();
+    m_swapchain->createImageViews();
 
     // Create the render pass & store
     m_renderPass = std::make_unique<WYVKRenderPass>(*m_swapchain, *m_device);
     m_renderPass->createRenderPass();
+    m_renderPass->createFramebuffers();
 
-    // Create graphics pipeline & render frame contexts (which includes the descriptorsetlayou which is needed in the pipeline)
+    // Create graphics pipeline & render frame contexts (which includes the descriptorsetlayout which is needed in the pipeline)
     createRenderFrameContexts();
 
     m_graphicsPipeline = std::make_unique<WYVKGraphicsPipeline>(*m_device, *m_swapchain, *m_renderPass);
     m_graphicsPipeline->createGraphicsPipeline(m_descriptorSetLayout->getLayout());
 
-    // Create framebuffers from swapchain image views
-    m_swapchain->createImageViews();
-    m_swapchain->createFrameBuffers(m_renderPass->getRenderPass());
 
-    m_commandPool = std::make_unique<WYVKCommandPool>(*m_device);
-   
+    m_commandPool = std::make_unique<WYVKCommandPool>(*m_device);   
     createCommandBuffers();
 
     // Create fence for transfer operations
@@ -84,11 +83,11 @@ void WYVKRenderer::beginFrameRecording(uint32_t currentFrame, uint32_t currentIm
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = m_renderPass->getRenderPass();
-    renderPassInfo.framebuffer = m_swapchain->getFrameBuffers()[currentImage];
+    renderPassInfo.framebuffer = m_renderPass->getFrameBuffers()[currentImage];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = m_swapchain->getExtent();
-    renderPassInfo.clearValueCount = 1;
-    renderPassInfo.pClearValues = &clearColor;
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
     vkCmdBeginRenderPass(*cmdBuffer->getCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 }
@@ -176,27 +175,39 @@ void WYVKRenderer::recreateSwapchain()
     vkDeviceWaitIdle(m_device->getLogicalDevice());
     WYVERN_LOG_INFO("Recreating swapchain");
 
-    // Clean up
-    m_swapchain->destroy();
-    for (FrameContext& context : m_frameContexts) {
+
+
+    // ==========================================
+    // DESTROY
+    // ==========================================
+    m_swapchain->destroy();                 // Destroy swapchain and image views
+    m_renderPass->destroyImageResources();  // destroy all image resources related to the renderpass such as depth and stencil images
+    m_renderPass->destroyFramebuffers();
+
+    for (FrameContext& context : m_frameContexts) {    // Destroy all sync objects from frame contexts
         destroySyncObjects(context);
     }
-    // Make sure to destroy the transfer fence too
-    vkDestroyFence(m_device->getLogicalDevice(), m_transferFence, nullptr);
+    vkDestroyFence(m_device->getLogicalDevice(), m_transferFence, nullptr);    // Make sure to destroy the transfer fence too
+    // ==========================================
 
 
-    // Recreate
-    m_swapchain->createSwapchain();
-    m_swapchain->createImageViews();
-    m_swapchain->createFrameBuffers(m_renderPass->getRenderPass());
-    for (FrameContext& context : m_frameContexts) {
-        createSyncObjects(context);
+
+    // ==========================================
+    // CREATE
+    // ==========================================
+    m_swapchain->createSwapchain(); // Create swapchain and images
+    m_swapchain->createImageViews(); // Create swapchain image views
+    m_renderPass->createImageResources(); // Create needed renderpass images and image views
+    m_renderPass->createFramebuffers(); // Recreate framebuffers based on the new image views
+
+    for (FrameContext& context : m_frameContexts) {    // Create all sync objects from frame contexts
+        createSyncObjects(context); 
     }
 
-    // Make sure to recreate the transfer fence. There's probably a better way to do this
-    VkFenceCreateInfo fenceInfo{};
+    VkFenceCreateInfo fenceInfo{};    // Make sure to recreate the transfer fence. There's probably a better way to do this
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     VK_CALL(vkCreateFence(m_device->getLogicalDevice(), &fenceInfo, nullptr, &m_transferFence), "Unable to create transfer fence!");
+    // ==========================================
 
 }
 
@@ -285,13 +296,13 @@ void WYVKRenderer::allocateStagingBuffer(VkDeviceSize size)
 
 void WYVKRenderer::createRenderFrameContexts()
 {
+    // Create descriptor pool of 10 descriptors and a max of 10 sets
+    m_descriptorPool = std::make_unique<WYVKDescriptorPool>(*m_device, 10, 10);
+    
     // Create descriptor layout bindings and actual layout object
     m_descriptorSetLayout = std::make_unique<WYVKDescriptorLayout>(*m_device);
     m_descriptorSetLayout->addBinding(0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
     m_descriptorSetLayout->createLayout();
-
-    // Create descriptor pool
-    m_descriptorPool = std::make_unique<WYVKDescriptorPool>(*m_device, 10, 10); // create a descriptor pool of 10 descriptors and a max of 10 sets
 
     m_frameContexts.resize(MAX_FRAMES_IN_FLIGHT + 1);
 
