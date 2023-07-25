@@ -87,6 +87,36 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Memory\memory_resource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Wyvern\GUI\imguihandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\backends\imgui_impl_glfw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\backends\imgui_impl_vulkan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\vk_utility\WYVK.h">
@@ -164,6 +194,42 @@
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Memory\memory_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Wyvern\GUI\imguihandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\backends\imgui_impl_glfw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\backends\imgui_impl_vulkan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\backends\imgui_impl_win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\misc\single_file\imgui_single_file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\misc\cpp\imgui_stdlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imgui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imgui_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imstb_rectpack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imstb_textedit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imstb_truetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Wyvern\Assets\Shaders\vertex.vert" />
@@ -171,5 +237,29 @@
     <None Include="src\Wyvern\Assets\Shaders\_manual_compile.bat">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="src\vendor\imgui\.editorconfig" />
+    <None Include="src\vendor\imgui\.gitattributes" />
+    <None Include="src\vendor\imgui\.gitignore" />
+    <None Include="src\vendor\imgui\backends\vulkan\generate_spv.sh" />
+    <None Include="src\vendor\imgui\backends\vulkan\glsl_shader.frag" />
+    <None Include="src\vendor\imgui\backends\vulkan\glsl_shader.vert" />
+    <None Include="src\vendor\imgui\docs\BACKENDS.md" />
+    <None Include="src\vendor\imgui\docs\CONTRIBUTING.md" />
+    <None Include="src\vendor\imgui\docs\EXAMPLES.md" />
+    <None Include="src\vendor\imgui\docs\FAQ.md" />
+    <None Include="src\vendor\imgui\docs\FONTS.md" />
+    <None Include="src\vendor\imgui\docs\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\vendor\imgui\docs\CHANGELOG.txt" />
+    <Text Include="src\vendor\imgui\docs\TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="src\vendor\imgui\misc\fonts\Cousine-Regular.ttf" />
+    <Font Include="src\vendor\imgui\misc\fonts\DroidSans.ttf" />
+    <Font Include="src\vendor\imgui\misc\fonts\Karla-Regular.ttf" />
+    <Font Include="src\vendor\imgui\misc\fonts\ProggyClean.ttf" />
+    <Font Include="src\vendor\imgui\misc\fonts\ProggyTiny.ttf" />
+    <Font Include="src\vendor\imgui\misc\fonts\Roboto-Medium.ttf" />
   </ItemGroup>
 </Project>

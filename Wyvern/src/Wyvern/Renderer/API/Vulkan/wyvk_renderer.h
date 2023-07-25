@@ -55,11 +55,22 @@ public:
     ~WYVKRenderer();
 
     /*
+    * Vulkan API Pattern : (https://vulkan-tutorial.com)
+    * Pointer to struct with creation info
+    * Pointer to custom allocator callbacks, always nullptr in this tutorial
+    * Pointer to the variable that stores the handle to the new object
+    */
+    void initRenderAPI();
+
+    /*
     * Waits for previous frame to finish via fences & prepares the next swapchain image for rendering.
     * This function returns a boolean value indicating whether the swapchain needs to be recreated. If the swapchain needs to
     * be recreated, this function will return false.
     */
     [[nodiscard]] bool acquireNextSwapchainImage(uint32_t currentFrame, uint32_t& currentImage);
+
+    // Submits a command to the command buffer immediately
+    void immediateSubmit(std::function<void(VkCommandBuffer cmd)>&& func); // rvalue ref to accept lambdas
 
     /*
     * Resets the command buffer at index `currentFrame`, starts recording, and begins the render pass
@@ -163,11 +174,23 @@ public:
     void bindDescriptorSets(uint32_t currentFrame);
 
     // Getters & Setters
-    inline std::vector<std::unique_ptr<WYVKCommandBuffer>>& getCommandBuffers() { return m_commandBuffers; }
-    inline WYVKSwapchain& getSwapchain() { return *m_swapchain; }
+    inline WYVKInstance& getInstance() { return *m_instance; }
     inline WYVKDevice& getDevice() { return *m_device; }
+    inline WYVKSwapchain& getSwapchain() { return *m_swapchain; }
+    inline WYVKRenderPass& getRenderPass() { return *m_renderPass; }
+    inline FrameContext& getFrameContext(uint32_t currentFrame) { return m_frameContexts[currentFrame]; }
+    inline WYVKCommandPool& getCommandPool() { return *m_commandPool; }
 
 private:
+
+    /*
+    Vulkan extensions are addendums to the Vulkan specification that drivers are not required to support.
+    They allow vendors to expand upon the existing API to allow the use of features that may be unique to
+    a particular vendor or generation of devices without having to retrofit the core API.
+    https://www.collabora.com/news-and-blog/blog/2022/10/19/a-look-at-vulkan-extensions-in-venus/
+    */
+    void checkGLFWSupportedExtensions(std::vector<VkExtensionProperties>& availableExtensionProperties);
+
     /*
     * Allocates memory and creates the command buffers to be submitted in the device's graphics queue
     * The number of command buffers to be created matches the number of frames in flight;
@@ -182,7 +205,7 @@ private:
     */
     void recreateCommandBuffers();
 
-    ///*
+    //*
     //* Creates and initializes all uniform buffers for usage in shaders and the rendering pipeline.
     //* The current approach is using one uniform buffer per frame, so the number of uniform buffers must be
     //* equal to MAX_FRAMES_IN_FLIGHT
@@ -226,12 +249,12 @@ private:
     std::unique_ptr<WYVKGraphicsPipeline> m_graphicsPipeline;
 
     std::unique_ptr<WYVKCommandPool> m_commandPool;
-    std::vector<std::unique_ptr<WYVKCommandBuffer>> m_commandBuffers;
+    //std::vector<std::unique_ptr<WYVKCommandBuffer>> m_commandBuffers;
 
-    std::vector<VkSemaphore> m_imageAvailableSemaphores;
-    std::vector<VkSemaphore> m_renderFinishedSemaphores;
+    //std::vector<VkSemaphore> m_imageAvailableSemaphores;
+    //std::vector<VkSemaphore> m_renderFinishedSemaphores;
 
-    std::vector<VkFence> m_inFlightFences;
+    //std::vector<VkFence> m_inFlightFences;
 
     // Staging buffer used for vertex & index data transfer to appropriate buffers on GPU
     // Transfer fence to signal once transfer operations are complete

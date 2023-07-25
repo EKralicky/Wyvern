@@ -50,6 +50,44 @@ WYVKRenderer::~WYVKRenderer()
 
 }
 
+void WYVKRenderer::checkGLFWSupportedExtensions(std::vector<VkExtensionProperties>& availableExtensionProperties)
+{
+    WYVERN_LOG_INFO("Checking support for required GLFW instance extensions...");
+    uint32_t glfwExtensionCount = 0;
+    const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+    for (uint32_t i = 0; i < glfwExtensionCount; i++) {
+        const char* currentExt = glfwExtensions[i];
+
+        auto result = std::find_if(availableExtensionProperties.begin(),
+            availableExtensionProperties.end(),
+            [currentExt](VkExtensionProperties e) { return strcmp(e.extensionName, currentExt); });
+
+        if (result != availableExtensionProperties.end()) {
+            WYVERN_LOG_INFO("\tExtension: {} | Satisfied", glfwExtensions[i]);
+        }
+        else {
+            WYVERN_LOG_INFO("\tExtension: {} | Not Found!", glfwExtensions[i]);
+        }
+    }
+}
+
+
+void WYVKRenderer::initRenderAPI()
+{
+    uint32_t extensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr); // get extension count
+    std::vector<VkExtensionProperties> extensions(extensionCount); // allocate space for extensions
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data()); // retrieve available extensions
+
+    WYVERN_LOG_INFO("Available Extensions:");
+    for (const auto& extension : extensions) {
+        WYVERN_LOG_INFO("\t{}", extension.extensionName);
+    }
+    checkGLFWSupportedExtensions(extensions);
+}
+
+
 bool WYVKRenderer::acquireNextSwapchainImage(uint32_t currentFrame, uint32_t& currentImage)
 {
     // Waits for the In - Flight Fence bound to a specific framebuffer to be signaled. When a fence is signaled, it means the work done previously on the 
@@ -72,6 +110,30 @@ bool WYVKRenderer::acquireNextSwapchainImage(uint32_t currentFrame, uint32_t& cu
     // the drawFrame function will exit early, and on the next frame the fence will be waiting for a non existent frame to finish 
     VK_CALL(vkResetFences(m_device->getLogicalDevice(), 1, &m_frameContexts[currentFrame].inFlightFence), "Failed to reset fence!");
     return true;
+}
+
+void WYVKRenderer::immediateSubmit(std::function<void(VkCommandBuffer cmd)>&& func) 
+{
+    WYVKCommandBuffer cmdBuffer = WYVKCommandBuffer(*m_device, *m_commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
+    cmdBuffer.startRecording(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+    func(*cmdBuffer.getCommandBuffer());
+
+    cmdBuffer.stopRecording();
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.waitSemaphoreCount = 0;
+    submitInfo.pWaitSemaphores = nullptr;
+    submitInfo.pWaitDstStageMask = nullptr;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = cmdBuffer.getCommandBuffer();
+    submitInfo.signalSemaphoreCount = 0;
+    submitInfo.pSignalSemaphores = nullptr;
+
+
+    VK_CALL(vkQueueSubmit(m_device->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE), "Failed to submit command buffer!");
+    VK_CALL(vkQueueWaitIdle(m_device->getGraphicsQueue()), "Failed to wait for graphics queue during single time command!");
 }
 
 void WYVKRenderer::beginFrameRecording(uint32_t currentFrame, uint32_t currentImage)
@@ -130,7 +192,9 @@ void WYVKRenderer::createCommandBuffers()
 
 void WYVKRenderer::recreateCommandBuffers()
 {
-    m_commandBuffers.clear();
+    for (FrameContext& context : m_frameContexts) {
+        context.commandBuffer.reset();
+    }
     createCommandBuffers();
 }
 

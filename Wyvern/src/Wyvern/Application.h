@@ -8,6 +8,8 @@
 #include "window.h"
 #include "Wyvern/Renderer/API/Vulkan/wyvk_renderer.h"
 #include "Renderer/API/Vulkan/Geometry/Model.h"
+#include "Wyvern/GUI/imguihandler.h"
+
 
 namespace Wyvern {
 
@@ -38,8 +40,8 @@ private:
     std::unique_ptr<Logger> m_logger;
     std::unique_ptr<Window> m_window;
     std::unique_ptr<WYVKRenderer> m_renderer;
+    std::unique_ptr<ImGuiHandler> m_imGuiHandler;
 
-    void initRenderAPI();
     void mainLoop();
 };
 
