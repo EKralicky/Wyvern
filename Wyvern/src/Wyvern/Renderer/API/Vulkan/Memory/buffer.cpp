@@ -94,7 +94,7 @@ uint32_t WYVKBuffer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags p
     }
 
     WYVERN_LOG_ERROR("Unable to find suitable memory type for buffer generation!");
-    WYVERN_ASSERT(false, "Unable to find suitable memory type for buffer generation!");
+    WYVERN_THROW("Unable to find suitable memory type for buffer generation!");
 }
 
 }

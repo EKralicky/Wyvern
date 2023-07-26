@@ -50,6 +50,7 @@ public:
             return m_mappedMemory;
         }
         WYVERN_LOG_ERROR("Unable to access uninitialized persistent mapping. m_mappedMemory is nullptr!\nMake sure you created a persistentMapping using `createPersistentMap()`");
+        WYVERN_THROW("Unable to access uninitialized persistent mapping!");
     }
 
     inline VkBuffer& getBuffer() { 
@@ -57,6 +58,7 @@ public:
             return m_buffer;
         }
         WYVERN_LOG_ERROR("Unable to access uninitialized buffer handle. m_buffer is VK_NULL_HANDLE!\nMake sure you assigned memory to this buffer using `assignMemory(void*)`");
+        WYVERN_THROW("Unable to access uninitialized buffer handle!");
     }
 
 private:

@@ -28,7 +28,7 @@ void WYVKDescriptorLayout::createLayout()
 {
     VkDescriptorSetLayoutCreateInfo layoutInfo{};
     layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfo.bindingCount = m_bindings.size();
+    layoutInfo.bindingCount = static_cast<uint32_t>(m_bindings.size());
     layoutInfo.pBindings = m_bindings.data();
 
     VK_CALL(vkCreateDescriptorSetLayout(m_device.getLogicalDevice(), &layoutInfo, nullptr, &m_layout), "Unable to create descriptor set layout!");

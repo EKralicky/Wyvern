@@ -53,7 +53,7 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 	for (Model& model : models) {
 		
 
-		m_renderer->bindVertexBuffers(m_currentFrame, model.getVertexBuffersCount(), model.getVertexBuffer());
+		m_renderer->bindVertexBuffers(m_currentFrame, static_cast<uint32_t>(model.getVertexBuffersCount()), model.getVertexBuffer());
 		m_renderer->bindIndexBuffer(m_currentFrame, *model.getIndexBuffer(), VK_INDEX_TYPE_UINT16);
 		m_renderer->bindDescriptorSets(m_currentFrame);
 
@@ -61,7 +61,7 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 			m_renderer->drawIndexed(m_currentFrame, static_cast<uint32_t>(model.getIndexCount()), 1, 0, 0, 0);
 		}
 		else {
-			m_renderer->draw(m_currentFrame, model.getVertexSize(), 1, 0, 0);
+			m_renderer->draw(m_currentFrame, static_cast<uint32_t>(model.getVertexSize()), 1, 0, 0);
 		}
 	}
 
@@ -103,7 +103,8 @@ void Application::mainLoop()
 	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {
 		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
 		m_imGuiHandler->newFrame();
-		ImGui::ShowDemoWindow();
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		m_imGuiHandler->createFrameDataPlot(1000.0f / ImGui::GetIO().Framerate);
 
 		WYVKRenderer::CameraMVPBuffer ubo{};
 		static auto startTime = std::chrono::high_resolution_clock::now();

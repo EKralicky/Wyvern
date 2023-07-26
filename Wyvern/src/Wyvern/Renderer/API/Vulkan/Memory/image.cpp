@@ -86,7 +86,7 @@ namespace Wyvern {
         }
         
         WYVERN_LOG_ERROR("Unable to find a supported image format!");
-        WYVERN_ASSERT(false, "Unable to find a supported image format!");
+        WYVERN_THROW("Unable to find a supported image format!");
     }
 
     void WYVKImage::createImageView(VkImageAspectFlags aspectFlags)

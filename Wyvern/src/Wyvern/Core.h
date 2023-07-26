@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <array>
 #include <chrono>
+#include <stdexcept> 
 
 // GLM for math
 #define GLM_FORCE_RADIANS
@@ -18,10 +19,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // IMGUI
-#include "imgui.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_vulkan.h"
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_vulkan.h"
 
+// IMPLOT widgets for ImGui Plotting
+#include "implot/implot.h"
+
+// Logging using spdlog
 #include "Wyvern/logger.h"
 
 // Surface creation method
@@ -30,6 +35,7 @@
 // Wyvern macros
 #define WYV_DEBUG_BREAK __debugbreak()
 #define WYVERN_ASSERT(assert_on, msg) if (!assert_on) { WYVERN_LOG_ERROR("Assertion Failed: {}", msg); WYV_DEBUG_BREAK; }
+#define WYVERN_THROW(message) throw std::runtime_error(message)
 
 // Vulkan macros
 #define VK_CALL(x, msg) { \

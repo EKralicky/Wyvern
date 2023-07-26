@@ -26,7 +26,7 @@ namespace Wyvern {
 		}
 
 		WYVERN_LOG_ERROR("Unable to find suitable memory type for resource generation!");
-		WYVERN_ASSERT(false, "Unable to find suitable memory type for resource generation!");
+		WYVERN_THROW("Unable to find suitable memory type for resource generation!");
 	}
 
 	void WYVKMemoryResource::createPersistentMapping()
