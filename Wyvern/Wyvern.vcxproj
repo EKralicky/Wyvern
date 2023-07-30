@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -166,7 +166,9 @@
     <ClCompile Include="src\vk_utility\WYVK.cpp" />
     <ClCompile Include="src\wyvern.cpp" />
     <ClCompile Include="src\Wyvern\application.cpp" />
+    <ClCompile Include="src\Wyvern\Entity\player.cpp" />
     <ClCompile Include="src\Wyvern\GUI\imguihandler.cpp" />
+    <ClCompile Include="src\Wyvern\Input\input_manager.cpp" />
     <ClCompile Include="src\Wyvern\logger.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandbuffer.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandpool.cpp" />
@@ -205,8 +207,14 @@
     <ClInclude Include="src\vendor\implot\implot_internal.h" />
     <ClInclude Include="src\vk_utility\WYVK.h" />
     <ClInclude Include="src\Wyvern\application.h" />
+    <ClInclude Include="src\Wyvern\Camera\camera.h" />
     <ClInclude Include="src\Wyvern\core.h" />
+    <ClInclude Include="src\Wyvern\Entity\entity.h" />
+    <ClInclude Include="src\Wyvern\Entity\player.h" />
     <ClInclude Include="src\Wyvern\GUI\imguihandler.h" />
+    <ClInclude Include="src\Wyvern\Input\input_action.h" />
+    <ClInclude Include="src\Wyvern\Input\input_manager.h" />
+    <ClInclude Include="src\Wyvern\Input\keycodes.h" />
     <ClInclude Include="src\Wyvern\logger.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorlayout.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorpool.h" />

@@ -10,16 +10,13 @@
 #include "Renderer/API/Vulkan/Geometry/Model.h"
 #include "Wyvern/GUI/imguihandler.h"
 
+#include "Entity/player.h"
+#include "Camera/camera.h"
 
 namespace Wyvern {
 
-//struct WindowPreference {
-//    uint32_t length;
-//    uint32_t width;
-//    const char* name;
-//    GLFWmonitor* monitor;
-//    GLFWwindow* share;
-//};
+#define BIND_VOID_FUNC(func, instance) std::bind(&func, std::ref(instance))                         // No parameters. This will be used for adding keybinds in the InputManager
+#define BIND_EVENT_FUNC(func, instance) std::bind(&func, std::ref(instance), std::placeholders::_1) // Event functions will have a placeholder for the `Event` type parameter
 
 static const uint32_t WINDOW_WIDTH = 800;
 static const uint32_t WINDOW_HEIGHT = 600;
@@ -27,7 +24,6 @@ static const uint32_t WINDOW_HEIGHT = 600;
 class Application
 {
 public:
-
     Application();
     ~Application();
         
@@ -41,6 +37,10 @@ private:
     std::unique_ptr<Window> m_window;
     std::unique_ptr<WYVKRenderer> m_renderer;
     std::unique_ptr<ImGuiHandler> m_imGuiHandler;
+
+    // Game stuff
+    Player m_player;
+    Camera m_camera;
 
     void mainLoop();
 };

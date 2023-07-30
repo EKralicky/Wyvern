@@ -51,6 +51,10 @@ public:
         {1.0f, 0}                // Clear value for depth-stencil attachment. First param is far plane distance
     } };
 
+
+
+
+
     WYVKRenderer(Window& window);
     ~WYVKRenderer();
 

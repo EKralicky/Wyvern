@@ -13,6 +13,8 @@ public:
 	Window(const char* title);
 	~Window();
 
+
+
 	inline GLFWwindow* getNativeWindow() const { return m_nativeWindow; }
 	inline bool isFramebufferResized() const { return m_framebufferResized; }
 	void setFramebufferResized(bool flag) { m_framebufferResized = flag; }

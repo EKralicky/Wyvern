@@ -54,6 +54,7 @@ namespace Wyvern {
 		ImGui_ImplVulkan_Init(&initInfo, m_renderer.getRenderPass().getRenderPass());
 		ImGui::StyleColorsDark();
 		setStyle();
+		setDocking();
 
 		m_renderer.immediateSubmit([&](VkCommandBuffer cmd) {
 			ImGui_ImplVulkan_CreateFontsTexture(cmd);
@@ -112,9 +113,9 @@ namespace Wyvern {
 		ImGuiStyle* style = &ImGui::GetStyle();
 
 		style->WindowPadding = ImVec2(15, 15);
-		style->WindowRounding = 5.0f;
+		style->WindowRounding = 0.0f;
 		style->FramePadding = ImVec2(5, 5);
-		style->FrameRounding = 4.0f;
+		style->FrameRounding = 0.0f;
 		style->ItemSpacing = ImVec2(12, 8);
 		style->ItemInnerSpacing = ImVec2(8, 6);
 		style->IndentSpacing = 25.0f;

@@ -1,22 +1,43 @@
 #include <vector>
+#include <functional>
+
 #include "Application.h"
 #include "Renderer/API/Vulkan/Geometry/vertex_geometry.h"
 #include "Renderer/API/Vulkan/Memory/buffer.h"
+#include "Wyvern/Input/input_manager.h"
 
 namespace Wyvern {
 
 Application::Application()
+	: m_player()
 {
 	// Initializes the Wyvern console logger for manual logging and the
 	// Renderer logger for Vulkan validation layer logging
 	m_logger = std::make_unique<Logger>();
 	m_logger->init();
+
+	// Window
 	m_window = std::make_unique<Window>("Wyvern App");
 
+	// Renderer using Vulkan
 	m_renderer = std::make_unique<WYVKRenderer>(*m_window);
 	m_renderer->initRenderAPI();
 
+	// GUI & Debug stuff from ImGui
 	m_imGuiHandler = std::make_unique<ImGuiHandler>(*m_window, *m_renderer);
+
+	// Input Handling. My philosophy on the function pointers bound to keys is that they should always have no params.
+	// This is because a single key press is none other than a key press. There is no other data associated it like with
+	// moving your mouse. Its basically a check for "is it pressed?" and if it is, a function gets called.
+	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, InputAction("Jump", InputType::CONTINUOUS, BIND_VOID_FUNC(Player::jump, m_player)));
+
+	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
+	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
+	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
+	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
+	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
+	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
+	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
 }
 
 Application::~Application()
@@ -94,18 +115,26 @@ void Application::mainLoop()
 		4, 5, 6, 6, 7, 4
 	};
 
-	// One time allocation of staging buffer
+	// One time allocation of staging buffer. The staging buffer is used to transfer vertex data from memory to the gpu memory.
 	m_renderer->allocateStagingBuffer(sizeof(vertices[0]) * vertices.size());
 
 	std::vector<Model> models;
 	models.emplace_back(*m_renderer, vertices, indices);
 
 	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {
-		glfwPollEvents(); // Poll for events e.g. Button presses, mouse movements, window close
-		m_imGuiHandler->newFrame();
+		glfwPollEvents();			// Poll for events e.g. Button presses, mouse movements, window close
+		m_imGuiHandler->newFrame(); // Start new ImGui Frame
+
+		// Handle ImGui Rendering
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		m_imGuiHandler->createFrameDataPlot(1000.0f / ImGui::GetIO().Framerate);
+		//
 
+
+		// Update Input THEN draw frame
+		InputManager::getInstance().processInput();
+
+		// Update Camera
 		WYVKRenderer::CameraMVPBuffer ubo{};
 		static auto startTime = std::chrono::high_resolution_clock::now();
 		auto currentTime = std::chrono::high_resolution_clock::now();
@@ -116,6 +145,7 @@ void Application::mainLoop()
 		ubo.view = glm::lookAt(glm::vec3(-2.0f, -2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 		ubo.proj = glm::perspective(glm::radians(45.0f), m_renderer->getSwapchain().getExtent().width / (float)m_renderer->getSwapchain().getExtent().height, 0.1f, 10.0f);
 
+		// Render Frame (Includes ImGui rendering)
 		drawFrame(models, true, (void*) &ubo, sizeof(ubo)); // Uses the render API to draw a single frame
 	}
 	// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
