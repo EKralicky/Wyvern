@@ -14,8 +14,8 @@ Window::Window(const char* title)
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);		// Disable resizing
 
 	m_nativeWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, title, nullptr, nullptr); // Create window instance
-	glfwSetWindowUserPointer(m_nativeWindow, this);
 
+    glfwSetWindowUserPointer(m_nativeWindow, &m_windowData);
 	glfwSetFramebufferSizeCallback(m_nativeWindow, Window::framebufferResizeCallback);
 }
 

@@ -142,14 +142,12 @@ void Application::mainLoop()
 		models.emplace_back(*m_renderer, vertices, indices);
 
 		while (!m_window->shouldClose()) {
-			// Poll GLFW events & process recieved input
-			m_window->pollEvents();
-			InputManager::getInstance().processInput();
+			
 
 			// == ImGui ==
 			m_imGuiHandler->newFrame();
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			m_imGuiHandler->createFrameDataPlot(1000.0f / ImGui::GetIO().Framerate);
+			//m_imGuiHandler->createFrameDataPlot(1000.0f / ImGui::GetIO().Framerate);
 			// ===========
 
 
@@ -168,6 +166,9 @@ void Application::mainLoop()
 
 			// Render Frame (Includes ImGui rendering)
 			drawFrame(models, true, (void*)&ubo, sizeof(ubo)); // Uses the render API to draw a single frame
+			// Poll GLFW events & process received input
+			InputManager::getInstance().processInput();
+			m_window->pollEvents();
 		}
 		// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
 		VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!");

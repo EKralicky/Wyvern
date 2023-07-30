@@ -20,25 +20,25 @@ void InputManager::processInput()
 
 bool InputManager::onMouseMoved(MouseMovedEvent& e)
 {
-	WYVERN_LOG_INFO("Mouse Moved");
+	//WYVERN_LOG_INFO("Mouse Moved");
 	return true;
 }
 
 bool InputManager::onMouseScrolled(MouseScrolledEvent& e)
 {
-	WYVERN_LOG_INFO("Mouse Scrolled");
+	//WYVERN_LOG_INFO("Mouse Scrolled");
 	return true;
 }
 
 bool InputManager::onKeyPressed(KeyPressedEvent& e)
 {
-	WYVERN_LOG_INFO("Key Pressed");
+	//WYVERN_LOG_INFO("Key Pressed");
 	return true;
 }
 
 bool InputManager::onKeyReleased(KeyReleasedEvent& e)
 {
-	WYVERN_LOG_INFO("Key Released");
+	//WYVERN_LOG_INFO("Key Released");
 	return true;
 }
 
