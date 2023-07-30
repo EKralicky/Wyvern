@@ -142,7 +142,10 @@ void Application::mainLoop()
 		models.emplace_back(*m_renderer, vertices, indices);
 
 		while (!m_window->shouldClose()) {
-			
+
+			// Poll GLFW events & process received input
+			m_window->pollEvents();
+			InputManager::getInstance().processInput();
 
 			// == ImGui ==
 			m_imGuiHandler->newFrame();
@@ -166,9 +169,7 @@ void Application::mainLoop()
 
 			// Render Frame (Includes ImGui rendering)
 			drawFrame(models, true, (void*)&ubo, sizeof(ubo)); // Uses the render API to draw a single frame
-			// Poll GLFW events & process received input
-			InputManager::getInstance().processInput();
-			m_window->pollEvents();
+			
 		}
 		// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
 		VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!");
