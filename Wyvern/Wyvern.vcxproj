@@ -166,6 +166,7 @@
     <ClCompile Include="src\vk_utility\WYVK.cpp" />
     <ClCompile Include="src\wyvern.cpp" />
     <ClCompile Include="src\Wyvern\application.cpp" />
+    <ClCompile Include="src\Wyvern\Entity\entity.cpp" />
     <ClCompile Include="src\Wyvern\Entity\player.cpp" />
     <ClCompile Include="src\Wyvern\GUI\imguihandler.cpp" />
     <ClCompile Include="src\Wyvern\Input\input_manager.cpp" />
@@ -211,6 +212,10 @@
     <ClInclude Include="src\Wyvern\core.h" />
     <ClInclude Include="src\Wyvern\Entity\entity.h" />
     <ClInclude Include="src\Wyvern\Entity\player.h" />
+    <ClInclude Include="src\Wyvern\Events\application_event.h" />
+    <ClInclude Include="src\Wyvern\Events\event.h" />
+    <ClInclude Include="src\Wyvern\Events\key_event.h" />
+    <ClInclude Include="src\Wyvern\Events\mouse_event.h" />
     <ClInclude Include="src\Wyvern\GUI\imguihandler.h" />
     <ClInclude Include="src\Wyvern\Input\input_action.h" />
     <ClInclude Include="src\Wyvern\Input\input_manager.h" />

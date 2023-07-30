@@ -13,7 +13,7 @@ public:
 
 
 private:
-	glm::mat4 m_projectionMatrix
+	glm::mat4 m_projectionMatrix;
 };
 
 }

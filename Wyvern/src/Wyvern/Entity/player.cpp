@@ -1,5 +1,19 @@
 #include "player.h"
 
-void Wyvern::Player::jump()
-{
+
+namespace Wyvern {
+
+	Player::Player()
+	{
+	}
+
+	Player::~Player()
+	{
+	}
+
+	void Player::jump()
+	{
+
+	}
 }
+

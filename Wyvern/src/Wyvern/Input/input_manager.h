@@ -3,6 +3,9 @@
 
 #include "Wyvern/core.h"
 #include "Wyvern/Input/input_action.h"
+#include "Wyvern/Events/application_event.h"
+#include "Wyvern/Events/key_event.h"
+#include "Wyvern/Events/mouse_event.h"
 
 namespace Wyvern {
 
@@ -64,10 +67,10 @@ public:
 	* and execute the action possibly with requirements if they are needed for the action.
 	* Also checks the modifier bitmask for modifier keys.
 	*/
-	void processInput(int activeModifierMask);
+	void processInput();
 
 	/*
-	* 
+	* its when the key updates
 	*/
 	void updateKey();
 
@@ -84,7 +87,15 @@ public:
 	/*
 	* Returns an InputAction reference bound to a keycode
 	*/
-	InputAction& getBoundAction(int keycode);
+	InputAction& getBoundAction(KeyRequirement& keycode);
+
+	/*
+	* i had pizza for lunch today
+	*/
+	bool onMouseMoved(MouseMovedEvent& e);
+	bool onMouseScrolled(MouseScrolledEvent& e);
+	bool onKeyPressed(KeyPressedEvent& e);
+	bool onKeyReleased(KeyReleasedEvent& e);
 
 private:
 	InputManager() {}

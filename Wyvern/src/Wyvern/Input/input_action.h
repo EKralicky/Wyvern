@@ -20,7 +20,7 @@ public:
 		return os << "Action Name: " << action.m_name << "\n";
 	}
 
-	InputAction(std::string name, InputType type, std::function<void()> func, int modifiers) 
+	InputAction(const char* name, InputType type, std::function<void()> func) 
 		: m_name(name), m_type(type), m_func(func)
 	{
 	}

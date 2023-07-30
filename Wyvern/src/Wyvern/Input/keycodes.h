@@ -1,11 +1,6 @@
 #pragma once
 
-
-namespace Wyvern {
-
-	namespace Keycodes {
-
-		// KEYCODE DEFINITIONS (These were stolen from GLFW)
+// KEYCODE DEFINITIONS (These were stolen from GLFW)
 #define WYVERN_KEY_NONE -1
 
 #define WYVERN_KEY_SPACE              32
@@ -133,7 +128,11 @@ namespace Wyvern {
 
 #define WYVERN_KEY_LAST               GLFW_KEY_MENU
 
-	}
-
-}
+#define 	WYVERN_MOD_NONE				0x0000
+#define 	WYVERN_MOD_SHIFT			0x0001
+#define 	WYVERN_MOD_CONTROL			0x0002
+#define 	WYVERN_MOD_ALT				0x0004
+#define 	WYVERN_MOD_SUPER			0x0008
+#define 	WYVERN_MOD_CAPS_LOCK		0x0010
+#define 	WYVERN_MOD_NUM_LOCK			0x0020
 

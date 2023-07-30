@@ -8,8 +8,10 @@
 
 namespace Wyvern {
 
+
+
 Application::Application()
-	: m_player()
+	: m_player(), m_camera()
 {
 	// Initializes the Wyvern console logger for manual logging and the
 	// Renderer logger for Vulkan validation layer logging
@@ -18,6 +20,7 @@ Application::Application()
 
 	// Window
 	m_window = std::make_unique<Window>("Wyvern App");
+	m_window->initCallbacks(BIND_INTERNAL_EVENT(Application::onEvent));
 
 	// Renderer using Vulkan
 	m_renderer = std::make_unique<WYVKRenderer>(*m_window);
@@ -26,27 +29,40 @@ Application::Application()
 	// GUI & Debug stuff from ImGui
 	m_imGuiHandler = std::make_unique<ImGuiHandler>(*m_window, *m_renderer);
 
+
 	// Input Handling. My philosophy on the function pointers bound to keys is that they should always have no params.
 	// This is because a single key press is none other than a key press. There is no other data associated it like with
 	// moving your mouse. Its basically a check for "is it pressed?" and if it is, a function gets called.
-	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, InputAction("Jump", InputType::CONTINUOUS, BIND_VOID_FUNC(Player::jump, m_player)));
+	InputManager::getInstance().bindKey(
+		KeyRequirement(WYVERN_KEY_SPACE, WYVERN_MOD_NONE),
+		InputAction("Jump", InputType::CONTINUOUS, BIND_EXTERNAL_FUNC(Player::jump, m_player)));
 
-	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
-	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
-	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
-	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
-	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
-	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
-	InputManager::getInstance().bindKey(WYVERN_KEY_SPACE, BIND_VOID_FUNC(Player::jump, m_player));
 }
 
 Application::~Application()
 {
+	
 }
 
 void Application::run()
 {
 	mainLoop();
+}
+
+void Application::onEvent(Event& e)
+{
+	EventDispatcher dispatcher(e);
+	dispatcher.dispatch<WindowCloseEvent>	(BIND_INTERNAL_EVENT(Application::onWindowClose));
+	dispatcher.dispatch<MouseMovedEvent>	(BIND_EXTERNAL_EVENT(InputManager::onMouseMoved,	InputManager::getInstance()));
+	dispatcher.dispatch<MouseScrolledEvent>	(BIND_EXTERNAL_EVENT(InputManager::onMouseScrolled,	InputManager::getInstance()));
+	dispatcher.dispatch<KeyPressedEvent>	(BIND_EXTERNAL_EVENT(InputManager::onKeyPressed,	InputManager::getInstance()));
+	dispatcher.dispatch<KeyReleasedEvent>	(BIND_EXTERNAL_EVENT(InputManager::onKeyReleased,	InputManager::getInstance()));
+}
+
+bool Application::onWindowClose(WindowCloseEvent& e)
+{
+	m_running = false;
+	return true;
 }
 
 /*
@@ -96,9 +112,13 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 
 }
 
+
+
 void Application::mainLoop()
 {
-	const std::vector<Vertex> vertices = {
+	while (m_running) {
+
+		const std::vector<Vertex> vertices = {
 		{{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
 		{{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
 		{{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
@@ -108,48 +128,50 @@ void Application::mainLoop()
 		{{0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
 		{{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
 		{{1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
-	};
+		};
 
-	const std::vector<uint16_t> indices = {
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4
-	};
+		const std::vector<uint16_t> indices = {
+			0, 1, 2, 2, 3, 0,
+			4, 5, 6, 6, 7, 4
+		};
 
-	// One time allocation of staging buffer. The staging buffer is used to transfer vertex data from memory to the gpu memory.
-	m_renderer->allocateStagingBuffer(sizeof(vertices[0]) * vertices.size());
+		// One time allocation of staging buffer. The staging buffer is used to transfer vertex data from memory to the gpu memory.
+		m_renderer->allocateStagingBuffer(sizeof(vertices[0]) * vertices.size());
 
-	std::vector<Model> models;
-	models.emplace_back(*m_renderer, vertices, indices);
+		std::vector<Model> models;
+		models.emplace_back(*m_renderer, vertices, indices);
 
-	while (!glfwWindowShouldClose(m_window->getNativeWindow())) {
-		glfwPollEvents();			// Poll for events e.g. Button presses, mouse movements, window close
-		m_imGuiHandler->newFrame(); // Start new ImGui Frame
+		while (!m_window->shouldClose()) {
+			// Poll GLFW events & process recieved input
+			m_window->pollEvents();
+			InputManager::getInstance().processInput();
 
-		// Handle ImGui Rendering
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		m_imGuiHandler->createFrameDataPlot(1000.0f / ImGui::GetIO().Framerate);
-		//
+			// == ImGui ==
+			m_imGuiHandler->newFrame();
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			m_imGuiHandler->createFrameDataPlot(1000.0f / ImGui::GetIO().Framerate);
+			// ===========
 
 
-		// Update Input THEN draw frame
-		InputManager::getInstance().processInput();
 
-		// Update Camera
-		WYVKRenderer::CameraMVPBuffer ubo{};
-		static auto startTime = std::chrono::high_resolution_clock::now();
-		auto currentTime = std::chrono::high_resolution_clock::now();
-		float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-		//ubo.model = glm::mat4(1);
-		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo.view = glm::lookAt(glm::vec3(-2.0f, -2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-		ubo.proj = glm::perspective(glm::radians(45.0f), m_renderer->getSwapchain().getExtent().width / (float)m_renderer->getSwapchain().getExtent().height, 0.1f, 10.0f);
+			// Update Camera
+			WYVKRenderer::CameraMVPBuffer ubo{};
+			static auto startTime = std::chrono::high_resolution_clock::now();
+			auto currentTime = std::chrono::high_resolution_clock::now();
+			float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-		// Render Frame (Includes ImGui rendering)
-		drawFrame(models, true, (void*) &ubo, sizeof(ubo)); // Uses the render API to draw a single frame
+			//ubo.model = glm::mat4(1);
+			ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			ubo.view = glm::lookAt(glm::vec3(-2.0f, -2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+			ubo.proj = glm::perspective(glm::radians(45.0f), m_renderer->getSwapchain().getExtent().width / (float)m_renderer->getSwapchain().getExtent().height, 0.1f, 10.0f);
+
+			// Render Frame (Includes ImGui rendering)
+			drawFrame(models, true, (void*)&ubo, sizeof(ubo)); // Uses the render API to draw a single frame
+		}
+		// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
+		VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!");
 	}
-	// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
-	VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!"); 
 }
 
 

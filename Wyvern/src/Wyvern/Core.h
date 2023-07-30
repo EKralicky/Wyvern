@@ -37,6 +37,8 @@
 #define WYVERN_ASSERT(assert_on, msg) if (!assert_on) { WYVERN_LOG_ERROR("Assertion Failed: {}", msg); WYV_DEBUG_BREAK; }
 #define WYVERN_THROW(message) throw std::runtime_error(message)
 
+#define BIT(x) (1 << x) // Bit shift 1 by x places
+
 // Vulkan macros
 #define VK_CALL(x, msg) { \
     if (x != VK_SUCCESS) { \

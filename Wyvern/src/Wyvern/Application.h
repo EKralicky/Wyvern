@@ -9,17 +9,22 @@
 #include "Wyvern/Renderer/API/Vulkan/wyvk_renderer.h"
 #include "Renderer/API/Vulkan/Geometry/Model.h"
 #include "Wyvern/GUI/imguihandler.h"
+#include "Wyvern/Events/event.h"
 
 #include "Entity/player.h"
 #include "Camera/camera.h"
 
+
 namespace Wyvern {
 
-#define BIND_VOID_FUNC(func, instance) std::bind(&func, std::ref(instance))                         // No parameters. This will be used for adding keybinds in the InputManager
-#define BIND_EVENT_FUNC(func, instance) std::bind(&func, std::ref(instance), std::placeholders::_1) // Event functions will have a placeholder for the `Event` type parameter
+#define BIND_INTERNAL_FUNC(func) std::bind(&func, this)                                     // Can be used to bind a function within the class this is used in
+#define BIND_EXTERNAL_FUNC(func, instance) std::bind(&func, std::ref(instance))             // Used to bind a function outside the class this is used in. Uses std::ref so we get the currently used instance not a copy
 
-static const uint32_t WINDOW_WIDTH = 800;
-static const uint32_t WINDOW_HEIGHT = 600;
+#define BIND_INTERNAL_EVENT(func) std::bind(&func, this, std::placeholders::_1)                 // Event functions will have a placeholder for the `Event` type parameter. The onEvent function must be a member of the class this is used in
+#define BIND_EXTERNAL_EVENT(func, instance) std::bind(&func, std::ref(instance), std::placeholders::_1)                 // Event functions will have a placeholder for the `Event` type parameter. The onEvent function must be a member of the class this is used in
+
+static const uint32_t WINDOW_WIDTH = 1920;
+static const uint32_t WINDOW_HEIGHT = 1080;
 
 class Application
 {
@@ -28,6 +33,8 @@ public:
     ~Application();
         
     void run();
+    void onEvent(Event& event);
+    bool onWindowClose(WindowCloseEvent& event);
     void drawFrame(std::vector<Model>& models, bool drawIndexed, void* uniformData, size_t uniformSize);
 
 private:
@@ -41,6 +48,9 @@ private:
     // Game stuff
     Player m_player;
     Camera m_camera;
+
+    // Is the application running? Will be set to false on windowCloseEvent
+    bool m_running = true;
 
     void mainLoop();
 };
