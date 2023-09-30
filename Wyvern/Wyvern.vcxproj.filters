@@ -21,9 +21,6 @@
     <ClCompile Include="src\Wyvern\logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\wyvern.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\vk_utility\WYVK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -285,6 +282,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Wyvern\Events\event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entry_point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

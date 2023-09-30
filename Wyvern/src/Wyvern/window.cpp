@@ -8,7 +8,7 @@ Window::Window(const char* title)
     m_windowData.windowWidth = WINDOW_WIDTH;
     m_windowData.windowHeight = WINDOW_HEIGHT;
 
-	WYVERN_LOG_INFO("Initializing Native window");
+	//WYVERN_LOG_INFO("Initializing Native window");
 	glfwInit();										// Initialize GLFW library
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);	// Do not create an opengl context since we are using VK. (GLFW was originally dessigned to do this)
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);		// Disable resizing
@@ -28,6 +28,13 @@ Window::~Window()
 void Window::pollEvents()
 {
     glfwPollEvents();			// Poll for events e.g. Button presses, mouse movements, window close
+}
+
+void Window::updateDeltaTime()
+{
+    float currentFrame = static_cast<float>(glfwGetTime());
+    m_deltaTime = currentFrame - m_lastFrameTime;
+    m_lastFrameTime = currentFrame;
 }
 
 void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height)

@@ -164,7 +164,6 @@
     <ClCompile Include="src\vendor\implot\implot_demo.cpp" />
     <ClCompile Include="src\vendor\implot\implot_items.cpp" />
     <ClCompile Include="src\vk_utility\WYVK.cpp" />
-    <ClCompile Include="src\wyvern.cpp" />
     <ClCompile Include="src\Wyvern\application.cpp" />
     <ClCompile Include="src\Wyvern\Entity\entity.cpp" />
     <ClCompile Include="src\Wyvern\Entity\player.cpp" />
@@ -193,6 +192,7 @@
     <ClCompile Include="src\Wyvern\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\entry_point.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_glfw.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_vulkan.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_win32.h" />

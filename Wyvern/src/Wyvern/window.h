@@ -20,11 +20,12 @@ public:
 	~Window();
 
 	void pollEvents();
+	void updateDeltaTime();
 	void initCallbacks(const EventCallbackFn& callback);
-
 	int shouldClose();
 
 	inline GLFWwindow* getNativeWindow() const { return m_nativeWindow; }
+	inline float deltaTime() const { return m_deltaTime; }
 	inline bool isFramebufferResized() const { return m_framebufferResized; }
 	void setFramebufferResized(bool flag) { m_framebufferResized = flag; }
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
@@ -41,6 +42,8 @@ private:
 	bool m_framebufferResized = false;
 	GLFWwindow* m_nativeWindow;
 	WindowData m_windowData;
+	float m_deltaTime = 0;
+	float m_lastFrameTime = 0;
 };
 
 }

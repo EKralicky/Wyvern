@@ -2,16 +2,15 @@
 #include <functional>
 
 #include "Application.h"
+#include "entry_point.h"
+
 #include "Renderer/API/Vulkan/Geometry/vertex_geometry.h"
 #include "Renderer/API/Vulkan/Memory/buffer.h"
 #include "Wyvern/Input/input_manager.h"
 
 namespace Wyvern {
 
-
-
 Application::Application()
-	: m_player(), m_camera()
 {
 	// Initializes the Wyvern console logger for manual logging and the
 	// Renderer logger for Vulkan validation layer logging
@@ -26,18 +25,22 @@ Application::Application()
 	m_renderer = std::make_unique<WYVKRenderer>(*m_window);
 	m_renderer->initRenderAPI();
 
+	// Create Scene
+	//m_scene = std::make_unique<Scene>();
+
 	// GUI & Debug stuff from ImGui
-	m_imGuiHandler = std::make_unique<ImGuiHandler>(*m_window, *m_renderer);
+	//m_imGuiHandler = std::make_unique<ImGuiHandler>(*m_window, *m_renderer);
 
 
 	// Input Handling. My philosophy on the function pointers bound to keys is that they should always have no params.
 	// This is because a single key press is none other than a key press. There is no other data associated it like with
 	// moving your mouse. Its basically a check for "is it pressed?" and if it is, a function gets called.
-	InputManager::getInstance().bindKey(
+	/*InputManager::getInstance().bindKey(
 		KeyRequirement(WYVERN_KEY_SPACE, WYVERN_MOD_NONE),
-		InputAction("Jump", InputType::CONTINUOUS, BIND_EXTERNAL_FUNC(Player::jump, m_player)));
+		InputAction("Jump", InputType::CONTINUOUS, BIND_EXTERNAL_FUNC(Player::jump, m_player)));*/
 
 }
+
 
 Application::~Application()
 {
@@ -102,7 +105,7 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 		}
 	}
 
-	m_imGuiHandler->renderFrame(*m_renderer->getFrameContext(m_currentFrame).commandBuffer);
+	//m_imGuiHandler->renderFrame(*m_renderer->getFrameContext(m_currentFrame).commandBuffer);
 	m_renderer->endFrameRecording(m_currentFrame);
 
 
@@ -124,7 +127,7 @@ void Application::mainLoop()
 		{{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
 		{{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
 
-		{{0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+		{{0.0f, 0.0f, 1.0f}, {1.0f, 0.0f,  .0f}},
 		{{0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
 		{{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
 		{{1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
@@ -142,20 +145,20 @@ void Application::mainLoop()
 		models.emplace_back(*m_renderer, vertices, indices);
 
 		while (!m_window->shouldClose()) {
-
+			//std::chrono::high_resolution_clock::time_point start, stop;
+			//start = std::chrono::high_resolution_clock::now();
 			// Poll GLFW events & process received input
-			m_window->pollEvents();
 			InputManager::getInstance().processInput();
+			m_window->updateDeltaTime();
+
 
 			// == ImGui ==
-			m_imGuiHandler->newFrame();
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			//m_imGuiHandler->newFrame();
+			//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			//ImGui::Text("Draw Time: %.3f ms/frame (%.2f FPS)", m_frameTime / 1000000.0f, 1000000000.0f / m_frameTime);
+
 			//m_imGuiHandler->createFrameDataPlot(1000.0f / ImGui::GetIO().Framerate);
-			// ===========
-
-
-
-
+			// =========== 
 			// Update Camera
 			WYVKRenderer::CameraMVPBuffer ubo{};
 			static auto startTime = std::chrono::high_resolution_clock::now();
@@ -168,14 +171,22 @@ void Application::mainLoop()
 			ubo.proj = glm::perspective(glm::radians(45.0f), m_renderer->getSwapchain().getExtent().width / (float)m_renderer->getSwapchain().getExtent().height, 0.1f, 10.0f);
 
 			// Render Frame (Includes ImGui rendering)
-			drawFrame(models, true, (void*)&ubo, sizeof(ubo)); // Uses the render API to draw a single frame
 			
+			drawFrame(models, true, (void*)&ubo, sizeof(ubo)); // Uses the render API to draw a single frame
+			//stop = std::chrono::high_resolution_clock::now();
+			//m_frameTime = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
+			m_window->pollEvents();
+
 		}
 		// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
 		VK_CALL(vkDeviceWaitIdle(m_renderer->getDevice().getLogicalDevice()), "DeviceWaitIdle Failed!");
 	}
 }
 
+}
 
 
+Wyvern::Application* Wyvern::createApplication()
+{
+	return new Application();
 }
