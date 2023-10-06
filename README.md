@@ -1,9 +1,8 @@
 # Wyvern
 
-### Overview
 Wyvern aims to be a real-time voxel raytracing engine. The main goal of this engine is to raytrace hundreds of millions of voxels to the screen in real-time, eventually to become the driver of an open world voxel game. 
 
-### Main Objectives
+### Objectives
 - Custom event based keybinding system to handle all user input
 - Raytraced rendering with shadows in real-time
 - Efficient voxel storage & compression -- Able to store and render a very large scene
