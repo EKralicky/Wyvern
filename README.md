@@ -17,7 +17,7 @@ Raytracing 100's of millions of voxels won't be very fast even with the latest h
 
 ### Dependencies Used
 - Vulkan
-  - shaderc
+  - shaderc glsl compiler
 - GLFW
 - GLM
 - ImGui
