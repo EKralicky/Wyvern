@@ -1,4 +1,4 @@
-# Wyvern
+# 🐲 Wyvern
 
 Wyvern aims to be a real-time voxel raytracing engine. The main goal of this engine is to raytrace hundreds of millions of voxels to the screen in real-time, eventually to become the driver of an open world voxel game. 
 
