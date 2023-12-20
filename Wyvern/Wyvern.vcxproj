@@ -168,7 +168,6 @@
     <ClCompile Include="src\Wyvern\Entity\entity.cpp" />
     <ClCompile Include="src\Wyvern\Entity\player.cpp" />
     <ClCompile Include="src\Wyvern\GUI\imguihandler.cpp" />
-    <ClCompile Include="src\Wyvern\Input\input_manager.cpp" />
     <ClCompile Include="src\Wyvern\logger.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandbuffer.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandpool.cpp" />
@@ -217,8 +216,7 @@
     <ClInclude Include="src\Wyvern\Events\key_event.h" />
     <ClInclude Include="src\Wyvern\Events\mouse_event.h" />
     <ClInclude Include="src\Wyvern\GUI\imguihandler.h" />
-    <ClInclude Include="src\Wyvern\Input\input_action.h" />
-    <ClInclude Include="src\Wyvern\Input\input_manager.h" />
+    <ClInclude Include="src\Wyvern\Input\input.h" />
     <ClInclude Include="src\Wyvern\Input\keycodes.h" />
     <ClInclude Include="src\Wyvern\logger.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\Descriptor\wyvk_descriptorlayout.h" />

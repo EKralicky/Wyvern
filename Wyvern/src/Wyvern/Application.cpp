@@ -6,7 +6,7 @@
 
 #include "Renderer/API/Vulkan/Geometry/vertex_geometry.h"
 #include "Renderer/API/Vulkan/Memory/buffer.h"
-#include "Wyvern/Input/input_manager.h"
+#include "Wyvern/Input/input.h"
 
 namespace Wyvern {
 
@@ -35,6 +35,8 @@ Application::Application()
 	// Input Handling. My philosophy on the function pointers bound to keys is that they should always have no params.
 	// This is because a single key press is none other than a key press. There is no other data associated it like with
 	// moving your mouse. Its basically a check for "is it pressed?" and if it is, a function gets called.
+	Input::initInput(m_window.get()->getNativeWindow());
+
 	/*InputManager::getInstance().bindKey(
 		KeyRequirement(WYVERN_KEY_SPACE, WYVERN_MOD_NONE),
 		InputAction("Jump", InputType::CONTINUOUS, BIND_EXTERNAL_FUNC(Player::jump, m_player)));*/
@@ -44,7 +46,7 @@ Application::Application()
 
 Application::~Application()
 {
-	
+	 
 }
 
 void Application::run()
@@ -56,10 +58,10 @@ void Application::onEvent(Event& e)
 {
 	EventDispatcher dispatcher(e);
 	dispatcher.dispatch<WindowCloseEvent>	(BIND_INTERNAL_EVENT(Application::onWindowClose));
-	dispatcher.dispatch<MouseMovedEvent>	(BIND_EXTERNAL_EVENT(InputManager::onMouseMoved,	InputManager::getInstance()));
+	/*dispatcher.dispatch<MouseMovedEvent>	(BIND_EXTERNAL_EVENT(InputManager::onMouseMoved,	InputManager::getInstance()));
 	dispatcher.dispatch<MouseScrolledEvent>	(BIND_EXTERNAL_EVENT(InputManager::onMouseScrolled,	InputManager::getInstance()));
 	dispatcher.dispatch<KeyPressedEvent>	(BIND_EXTERNAL_EVENT(InputManager::onKeyPressed,	InputManager::getInstance()));
-	dispatcher.dispatch<KeyReleasedEvent>	(BIND_EXTERNAL_EVENT(InputManager::onKeyReleased,	InputManager::getInstance()));
+	dispatcher.dispatch<KeyReleasedEvent>	(BIND_EXTERNAL_EVENT(InputManager::onKeyReleased,	InputManager::getInstance()));*/
 }
 
 bool Application::onWindowClose(WindowCloseEvent& e)
@@ -146,9 +148,15 @@ void Application::mainLoop()
 
 		while (!m_window->shouldClose()) {
 			//std::chrono::high_resolution_clock::time_point start, stop;
-			//start = std::chrono::high_resolution_clock::now();
+			auto start = std::chrono::high_resolution_clock::now();
+			int state = glfwGetKey(m_window->getNativeWindow(), GLFW_KEY_E);
+			m_window->pollEvents();
+			auto stop = std::chrono::high_resolution_clock::now();
+			std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count() << std::endl;
 			// Poll GLFW events & process received input
-			InputManager::getInstance().processInput();
+			if (Input::isKeyPressed(WYVERN_KEY_W)) {
+				std::cout << "W KEY PRESSED!!!";
+			}
 			m_window->updateDeltaTime();
 
 
@@ -175,7 +183,6 @@ void Application::mainLoop()
 			drawFrame(models, true, (void*)&ubo, sizeof(ubo)); // Uses the render API to draw a single frame
 			//stop = std::chrono::high_resolution_clock::now();
 			//m_frameTime = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
-			m_window->pollEvents();
 
 		}
 		// Wait for the physical device (GPU) to be idle (Not working on anything) before we quit
