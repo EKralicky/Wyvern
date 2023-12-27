@@ -1,5 +1,5 @@
 
-![wyvern](https://github.com/EKralicky/Wyvern/assets/88636893/52ad9008-5d5e-4336-b5be-00c28cbe21d4)
+![wyvern](https://github.com/EKralicky/Wyvern/assets/88636893/7de0ffc6-de6f-400e-8f31-ef31989b56ad)
 
 Wyvern aims to be a real-time voxel raytracing engine (Currently only supports rasterization). The main goal of this engine is to raytrace hundreds of millions of voxels to the screen in real-time, eventually to become the driver of an open world voxel game. 
 
