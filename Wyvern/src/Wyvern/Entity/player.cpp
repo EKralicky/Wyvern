@@ -10,10 +10,5 @@ namespace Wyvern {
 	Player::~Player()
 	{
 	}
-
-	void Player::jump()
-	{
-
-	}
 }
 

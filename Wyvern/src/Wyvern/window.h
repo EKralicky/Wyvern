@@ -29,6 +29,9 @@ public:
 	inline bool isFramebufferResized() const { return m_framebufferResized; }
 	void setFramebufferResized(bool flag) { m_framebufferResized = flag; }
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+	int getWidth() { return m_windowData.windowWidth; }
+	int getHeight() { return m_windowData.windowHeight; }
+
 
 private:
 	struct WindowData {

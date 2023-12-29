@@ -13,7 +13,7 @@
 
 #include "Entity/player.h"
 #include "Camera/camera.h"
-//#include "scene.h"
+#include "scene.h"
 
 
 namespace Wyvern {
@@ -37,6 +37,8 @@ public:
     void onEvent(Event& event);
     bool onWindowClose(WindowCloseEvent& event);
     void drawFrame(std::vector<Model>& models, bool drawIndexed, void* uniformData, size_t uniformSize);
+    Window& getWindow() { return *m_window; }
+
 
     static Application& get() { return *s_Instance; };
 
@@ -49,7 +51,7 @@ private:
     std::unique_ptr<Window> m_window;
     std::unique_ptr<WYVKRenderer> m_renderer;
     std::unique_ptr<ImGuiHandler> m_imGuiHandler;
-    //std::unique_ptr<Scene> m_scene;
+    std::unique_ptr<Scene> m_scene;
 
     // Is the application running? Will be set to false on windowCloseEvent
     bool m_running = true;

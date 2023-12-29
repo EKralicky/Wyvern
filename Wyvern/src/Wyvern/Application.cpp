@@ -1,4 +1,4 @@
-#include <vector>
+ #include <vector>
 #include <functional>
 
 #include "Application.h"
@@ -7,6 +7,7 @@
 #include "Renderer/API/Vulkan/Geometry/vertex_geometry.h"
 #include "Renderer/API/Vulkan/Memory/buffer.h"
 #include "Wyvern/Input/input.h"
+#include "Scene.h"
 
 namespace Wyvern {
 
@@ -26,8 +27,8 @@ Application::Application()
 	m_renderer->initRenderAPI();
 
 	// Create Scene
-	//m_scene = std::make_unique<Scene>();
-
+	m_scene = std::make_unique<Scene>();
+	m_scene->initScene();
 	// GUI & Debug stuff from ImGui
 	//m_imGuiHandler = std::make_unique<ImGuiHandler>(*m_window, *m_renderer);
 
@@ -87,7 +88,7 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 
 	m_renderer->beginFrameRecording(m_currentFrame, currentImage);
 
-	m_renderer->setupGraphicsPipeline(m_currentFrame);
+	m_renderer->setupGraphicsPipeline(m_currentFrame);         
 	m_renderer->bindPipeline(m_currentFrame);
 
 	m_renderer->updateUniformBuffers(currentImage, uniformData, uniformSize);
@@ -147,19 +148,9 @@ void Application::mainLoop()
 		models.emplace_back(*m_renderer, vertices, indices);
 
 		while (!m_window->shouldClose()) {
-			//std::chrono::high_resolution_clock::time_point start, stop;
-			auto start = std::chrono::high_resolution_clock::now();
-			int state = glfwGetKey(m_window->getNativeWindow(), GLFW_KEY_E);
 			m_window->pollEvents();
-			auto stop = std::chrono::high_resolution_clock::now();
-			std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count() << std::endl;
-			// Poll GLFW events & process received input
-			if (Input::isKeyPressed(WYVERN_KEY_W)) {
-				std::cout << "W KEY PRESSED!!!";
-			}
 			m_window->updateDeltaTime();
-
-
+			m_scene->update(m_window->deltaTime());
 			// == ImGui ==
 			//m_imGuiHandler->newFrame();
 			//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);

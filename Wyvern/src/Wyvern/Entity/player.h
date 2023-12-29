@@ -3,13 +3,11 @@
 
 namespace Wyvern {
 
-class Player : Entity {
+class Player : public Entity {
 
 public:
 	Player();
 	~Player();
-
-	void jump();
 
 private:
 
