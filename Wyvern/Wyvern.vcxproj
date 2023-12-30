@@ -209,7 +209,6 @@
     <ClInclude Include="src\vendor\implot\implot.h" />
     <ClInclude Include="src\vendor\implot\implot_internal.h" />
     <ClInclude Include="src\Wyvern\application.h" />
-    <ClInclude Include="src\Wyvern\Camera\camera.h" />
     <ClInclude Include="src\Wyvern\Camera\perspective_camera.h" />
     <ClInclude Include="src\Wyvern\Components\transform.h" />
     <ClInclude Include="src\Wyvern\core.h" />

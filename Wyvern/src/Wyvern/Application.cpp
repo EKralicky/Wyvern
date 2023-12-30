@@ -26,9 +26,6 @@ Application::Application()
 	m_renderer = std::make_unique<WYVKRenderer>(*m_window);
 	m_renderer->initRenderAPI();
 
-	// Create Scene
-	m_scene = std::make_unique<Scene>();
-	m_scene->initScene();
 	// GUI & Debug stuff from ImGui
 	//m_imGuiHandler = std::make_unique<ImGuiHandler>(*m_window, *m_renderer);
 
@@ -124,6 +121,10 @@ void Application::mainLoop()
 {
 	while (m_running) {
 
+		// Create Scene
+		m_scene = std::make_unique<Scene>();
+		m_scene->initScene();
+
 		const std::vector<Vertex> vertices = {
 		{{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
 		{{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
@@ -165,10 +166,11 @@ void Application::mainLoop()
 			float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 			//ubo.model = glm::mat4(1);
-			ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			ubo.view = glm::lookAt(glm::vec3(-2.0f, -2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-			ubo.proj = glm::perspective(glm::radians(45.0f), m_renderer->getSwapchain().getExtent().width / (float)m_renderer->getSwapchain().getExtent().height, 0.1f, 10.0f);
-
+			ubo.model = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			//ubo.view = glm::lookAt(glm::vec3(-2.0f, -2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+			//ubo.proj = glm::perspective(glm::radians(45.0f), m_renderer->getSwapchain().getExtent().width / (float)m_renderer->getSwapchain().getExtent().height, 0.1f, 10.0f);
+			ubo.view = m_scene->getMainCamera().getViewMatrix();
+			ubo.proj = m_scene->getMainCamera().getProjectionMatrix();
 			// Render Frame (Includes ImGui rendering)
 			
 			drawFrame(models, true, (void*)&ubo, sizeof(ubo)); // Uses the render API to draw a single frame
@@ -181,10 +183,12 @@ void Application::mainLoop()
 	}
 }
 
-}
 
-
-Wyvern::Application* Wyvern::createApplication()
+Application* createApplication()
 {
-	return new Application();
+	return Application::get();
 }
+
+}
+
+

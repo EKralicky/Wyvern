@@ -12,7 +12,6 @@
 #include "Wyvern/Events/event.h"
 
 #include "Entity/player.h"
-#include "Camera/camera.h"
 #include "scene.h"
 
 
@@ -39,10 +38,12 @@ public:
     void drawFrame(std::vector<Model>& models, bool drawIndexed, void* uniformData, size_t uniformSize);
     Window& getWindow() { return *m_window; }
 
-
-    static Application& get() { return *s_Instance; };
-
-
+    static Application* get() { 
+        if (!s_Instance) {
+            s_Instance = new Application();
+        }
+        return s_Instance;
+    };
 
 private:
     uint32_t m_currentFrame = 0;

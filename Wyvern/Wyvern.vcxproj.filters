@@ -260,9 +260,6 @@
     <ClInclude Include="src\Wyvern\Input\keycodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Wyvern\Camera\camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Wyvern\Entity\player.h">
       <Filter>Header Files</Filter>
     </ClInclude>

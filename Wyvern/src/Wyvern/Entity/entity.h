@@ -1,13 +1,12 @@
 #pragma once
 #include "Wyvern/Components/transform.h"
-#include "Wyvern/Camera/perspective_camera.h"
 
 namespace Wyvern {
 
 class Entity {
 	
 public:
-	Entity(glm::vec3 position);
+	Entity(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f));
 	~Entity();
 
 	/*
@@ -19,13 +18,7 @@ public:
 	* e.g. if the movementVector is (1, 0, -1), the entity will move 1 unit "forward" and 1 movement to the left
 	* relative to where the entity is facing
 	*/
-	void moveRelative(glm::vec3 movementVector, float mdx, float mdy, float deltaTime);
-
-	/*
-	* When a camera is attached to an entity, the camera will "follow" the entity (for first person).
-	* i.e. The transforms of the player and camera will be in sync
-	*/
-	void attachCamera(PerspectiveCamera& camera);
+	void moveRelative(glm::vec3 movementVector, float deltaTime);
 
 	/*
 	* Sets the entities base movement speed.
@@ -40,7 +33,6 @@ public:
 
 private:
 	std::unique_ptr<Transform> m_transform;
-	PerspectiveCamera& m_camera;
 	float m_baseMovementSpeed;
 };
 
