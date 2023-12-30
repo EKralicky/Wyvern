@@ -44,8 +44,8 @@ void EntityController::update(float deltaTime)
 	m_lastCursorY = cursorY;
 
 	// Update entity transform vectors based on mouse position before moving relative
-	m_pawn->getTransform().updateRotation(deltaCursorX, deltaCursorY, m_camera->getSensitivity());
-	m_camera->getTransform().updateRotation(deltaCursorX, deltaCursorY, m_camera->getSensitivity());
+	m_pawn->getTransform().updateRotation(deltaCursorX, deltaCursorY, m_sensitivity);
+	m_camera->getTransform().updateRotation(deltaCursorX, deltaCursorY, m_sensitivity);
 	// Move the player relative to their rotation
 	//m_pawn->moveRelative(m_movementVector);
 

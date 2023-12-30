@@ -16,7 +16,6 @@ public:
 	Entity* getTarget() { return m_target; }
 	glm::mat4 getViewMatrix();
 	glm::mat4 getProjectionMatrix();
-	float getSensitivity() { return m_sensitivity; }
 	Transform& getTransform() { return *m_transform; }
 
 private:
@@ -25,7 +24,6 @@ private:
 	Entity* m_target = nullptr;
 	
 	float m_targetDistance = 0.0f;
-	float m_sensitivity = 0.01f;
 };
 
 }
