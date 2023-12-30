@@ -16,6 +16,8 @@ public:
 	Entity* getTarget() { return m_target; }
 	glm::mat4 getViewMatrix();
 	glm::mat4 getProjectionMatrix();
+
+	void updateTransformFromTarget();
 	Transform& getTransform() { return *m_transform; }
 
 private:

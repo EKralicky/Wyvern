@@ -6,7 +6,7 @@ namespace Wyvern {
 class Entity {
 	
 public:
-	Entity(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f));
+	Entity(glm::vec3 position = { 0.0f, 0.0f, 0.0f });
 	~Entity();
 
 	/*

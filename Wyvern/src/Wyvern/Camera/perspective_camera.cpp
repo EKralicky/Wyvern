@@ -19,6 +19,18 @@ glm::mat4 PerspectiveCamera::getProjectionMatrix()
 	return m_projectionMatrix;
 }
 
+/*
+* There's probably a better way to do this but this is the simplest I found
+*/
+void PerspectiveCamera::updateTransformFromTarget()
+{
+	m_transform->setValues(
+		m_target->getTransform().getPosition(),
+		m_target->getTransform().getOrientation(),
+		m_target->getTransform().getFront()
+	);
+}
+
 glm::mat4 PerspectiveCamera::getViewMatrix()
 {
 	return m_transform->getViewMatrix();
