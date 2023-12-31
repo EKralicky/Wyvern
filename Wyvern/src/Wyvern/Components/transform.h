@@ -25,9 +25,9 @@ public:
 	* This vector is relative to the transforms orientation, so for example a vector of
 	* (1.0f, 0.0f, -1.0f) will move the object forward and to the left
 	*/
-	void updatePosition(glm::vec3 relativeVelocity);
+	void updatePosition(glm::vec3& relativeVelocity);
 
-	void setPosition(glm::vec3 position);
+	void setPosition(glm::vec3& position);
 
 	void setValues(glm::vec3 position, glm::quat orientation, glm::vec3 front)
 	{

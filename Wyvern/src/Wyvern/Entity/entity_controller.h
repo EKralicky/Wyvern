@@ -33,7 +33,7 @@ private:
 	*
 	* Think of it like a person holding a camera. Does the camera control how fast the person moves it?
 	*/
-	float m_sensitivity = 0.01f;
+	float m_sensitivity = 0.001f;
 };
 
 }

@@ -15,6 +15,9 @@
 
 // GLM for math
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_RIGHT_HANDED
+#define GLM_FORCE_MESSAGES
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>

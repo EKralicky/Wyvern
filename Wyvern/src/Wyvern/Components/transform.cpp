@@ -3,9 +3,9 @@
 namespace Wyvern {
 
 Transform::Transform(glm::vec3 position)
-	:m_position({ 0.0f, 0.0f, 0.0f }),
+	:m_position(position),
 	m_orientation({ 1.0f, 0.0f, 0.0f, 0.0f }),
-	m_front({1.0f, 0.0f, 0.0f})
+	m_front({0.0f, 0.0f, 1.0f})
 {
 }
 
@@ -30,15 +30,19 @@ void Transform::updateOrientation(float deltaPitch, float deltaYaw, float scale)
 	glm::quat quatYaw = glm::angleAxis(m_yawAngle, glm::vec3(0, 1, 0));
 
 	m_orientation = glm::normalize(quatYaw * quatPitch);
-	m_front = { m_orientation.x, m_orientation.y, m_orientation.z };
+	m_front = glm::rotate(m_orientation, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
-void Transform::updatePosition(glm::vec3 relativeVelocity)
+void Transform::updatePosition(glm::vec3& relativeVelocity)
 {
-
+	WYVERN_LOG_INFO(relativeVelocity.x);
+	glm::vec3 left = glm::cross(m_front, m_worldUp);
+	m_position += relativeVelocity.x * left * 0.01f;
+	m_position += relativeVelocity.y * m_worldUp * 0.01f;
+	m_position += relativeVelocity.z * m_front * 0.01f;
 }
 
-void Transform::setPosition(glm::vec3 position)
+void Transform::setPosition(glm::vec3& position)
 {
 	m_position = position;
 }

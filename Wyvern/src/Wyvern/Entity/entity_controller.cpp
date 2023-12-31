@@ -32,11 +32,12 @@ void EntityController::update(float deltaTime)
 		movementVector.z -= 1.0f;
 	}
 	if (Input::isKeyPressed(WYVERN_KEY_SPACE)) {
-		movementVector.y += 1.0f;
+		movementVector.y -= 1.0f; // Using negative her because vulkan uses a coordinate system where the y coordinate goes down
 	}
 	if (Input::isKeyPressed(WYVERN_KEY_LEFT_CONTROL)) {
-		movementVector.y -= 1.0f;
+		movementVector.y += 1.0f;
 	}
+	//WYVERN_LOG_INFO(movementVector.x);
 	glfwGetCursorPos(Application::get()->getWindow().getNativeWindow(), &cursorX, &cursorY);
 	float deltaCursorX = static_cast<float>(cursorX - m_lastCursorX);
 	float deltaCursorY = static_cast<float>(cursorY - m_lastCursorY);
@@ -45,7 +46,7 @@ void EntityController::update(float deltaTime)
 
 	// Update entity transform vectors based on mouse position before moving relative
 	m_pawn->getTransform().updateOrientation(deltaCursorY, deltaCursorX, m_sensitivity);
-	m_pawn->getTransform().updatePosition(m_movementVector);
+	m_pawn->getTransform().updatePosition(movementVector);
 }
 
 }

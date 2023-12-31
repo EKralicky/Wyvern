@@ -5,7 +5,7 @@ namespace Wyvern {
 
 PerspectiveCamera::PerspectiveCamera()
 	:m_transform(std::make_unique<Transform>()),
-	m_projectionMatrix(glm::perspective(glm::radians(45.0f), (float)Application::get()->getWindow().getWidth() / (float)Application::get()->getWindow().getHeight(), 0.1f, 10.0f))
+	m_projectionMatrix(glm::perspective(glm::radians(45.0f), (float)Application::get()->getWindow().getWidth() / (float)Application::get()->getWindow().getHeight(), 0.1f, 1000.0f))
 {	
 }
 
