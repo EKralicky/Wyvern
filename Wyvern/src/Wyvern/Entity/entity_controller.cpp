@@ -32,10 +32,10 @@ void EntityController::update(float deltaTime)
 		movementVector.x -= 1.0f;
 	}
 	if (Input::isKeyPressed(WYVERN_KEY_SPACE)) {
-		movementVector.y -= 1.0f; // Using negative her because vulkan uses a coordinate system where the y coordinate goes down
+		movementVector.y += 1.0f; // Using negative her because vulkan uses a coordinate system where the y coordinate goes down
 	}
 	if (Input::isKeyPressed(WYVERN_KEY_LEFT_CONTROL)) {
-		movementVector.y += 1.0f;
+		movementVector.y -= 1.0f;
 	}
 	//WYVERN_LOG_INFO(movementVector.x);
 	glfwGetCursorPos(Application::get()->getWindow().getNativeWindow(), &cursorX, &cursorY);

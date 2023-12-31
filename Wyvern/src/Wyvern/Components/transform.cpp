@@ -4,8 +4,8 @@ namespace Wyvern {
 
 Transform::Transform(glm::vec3 position)
 	:m_position(position),
-	m_orientation(glm::quat(0.0f, 0.0f, 0.0f, -1.0f)),
-	m_front({0.0f, 0.0f, -1.0f})
+	m_orientation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
+	m_front({0.0f, 0.0f, 1.0f})
 {
 }
 
@@ -28,11 +28,11 @@ void Transform::updateOrientation(float deltaPitch, float deltaYaw, float scale)
 	m_yawAngle += deltaYaw;
 
 	if (m_lockPitch) {
-		if (m_pitchAngle > 89.9) {
-			m_pitchAngle = 89.9;
+		if (m_pitchAngle > 89.9f) {
+			m_pitchAngle = 89.9f;
 		}
-		else if (m_pitchAngle < -89.9) {
-			m_pitchAngle = -89.9;
+		else if (m_pitchAngle < -89.9f) {
+			m_pitchAngle = -89.9f;
 		}
 	}
 
@@ -42,14 +42,8 @@ void Transform::updateOrientation(float deltaPitch, float deltaYaw, float scale)
 	else if (m_yawAngle < 0.0f) {
 		m_yawAngle += 360.0f;
 	}
-
-	glm::quat quatPitch = glm::angleAxis(glm::radians(-m_pitchAngle), glm::vec3(1, 0, 0));
-	glm::quat quatYaw = glm::angleAxis(glm::radians(m_yawAngle), glm::vec3(0, 1, 0));
-
-	m_orientation = glm::normalize(quatYaw * quatPitch);
-	m_front = glm::rotate(m_orientation, glm::vec3(0.0f, 0.0f, 1.0f));
 	
-	//updateQuatOrientation();
+	updateQuatOrientation();
 }
 
 void Transform::updateQuatOrientation()
@@ -57,7 +51,7 @@ void Transform::updateQuatOrientation()
 	glm::quat quatPitch = glm::angleAxis(glm::radians(m_pitchAngle), glm::vec3(1, 0, 0));
 	glm::quat quatYaw = glm::angleAxis(glm::radians(m_yawAngle), glm::vec3(0, 1, 0));
 
-	m_orientation = glm::normalize(quatPitch * quatYaw);
+	m_orientation = glm::normalize(quatYaw * quatPitch);
 	m_front = glm::rotate(m_orientation, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 

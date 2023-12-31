@@ -126,20 +126,37 @@ void Application::mainLoop()
 		m_scene->initScene();
 
 		const std::vector<Vertex> vertices = {
+		// Front (clockwise)
 		{{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
 		{{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
 		{{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
 		{{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
 
+		// Back (cc)
 		{{1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
 		{{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-		{{0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
-		{{0.0f, 0.0f, 1.0f}, {1.0f, 0.0f,  .0f}}
+		{{0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 1.0f}},
+
+		//Top (cc) (Bottom in VK cause y flip)
+		{{0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 1.0f}},
+		{{0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+
+		//Bottom (clockwise) (Top in VK cause y flip)
+		{{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+		{{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 1.0f}},
+		
 		};
 
 		const std::vector<uint16_t> indices = {
 			0, 1, 2, 2, 3, 0,
-			4, 5, 6, 6, 7, 4
+			4, 5, 6, 6, 7, 4,
+			8, 9, 10, 10, 11, 8,
+			12, 13, 14, 14, 15, 12
 		};
 
 		// One time allocation of staging buffer. The staging buffer is used to transfer vertex data from memory to the gpu memory.

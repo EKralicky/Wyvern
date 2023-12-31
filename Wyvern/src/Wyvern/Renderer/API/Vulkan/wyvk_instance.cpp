@@ -10,6 +10,7 @@ Wyvern::WYVKInstance::WYVKInstance()
     }
 
     VkApplicationInfo appInfo{};
+    //appInfo.apiVersion = VK_API_VERSION_1_;
     VKInfo::createAppInfo(appInfo);
 
     VkInstanceCreateInfo createInfo{};
