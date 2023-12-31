@@ -27,7 +27,7 @@ Application::Application()
 	m_renderer->initRenderAPI();
 
 	// GUI & Debug stuff from ImGui
-	//m_imGuiHandler = std::make_unique<ImGuiHandler>(*m_window, *m_renderer);
+	m_imGuiHandler = std::make_unique<ImGuiHandler>(*m_window, *m_renderer);
 
 
 	// Input Handling. My philosophy on the function pointers bound to keys is that they should always have no params.
@@ -105,7 +105,7 @@ void Application::drawFrame(std::vector<Model>& models, bool drawIndexed, void* 
 		}
 	}
 
-	//m_imGuiHandler->renderFrame(*m_renderer->getFrameContext(m_currentFrame).commandBuffer);
+	m_imGuiHandler->renderFrame(*m_renderer->getFrameContext(m_currentFrame).commandBuffer);
 	m_renderer->endFrameRecording(m_currentFrame);
 
 
@@ -131,10 +131,10 @@ void Application::mainLoop()
 		{{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
 		{{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
 
-		{{0.0f, 0.0f, 1.0f}, {1.0f, 0.0f,  .0f}},
-		{{0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
-		{{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
 		{{1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
+		{{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+		{{0.0f, 0.0f, 1.0f}, {1.0f, 0.0f,  .0f}}
 		};
 
 		const std::vector<uint16_t> indices = {
@@ -153,8 +153,13 @@ void Application::mainLoop()
 			m_window->updateDeltaTime();
 			m_scene->update(m_window->deltaTime());
 			// == ImGui ==
-			//m_imGuiHandler->newFrame();
-			//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			m_imGuiHandler->newFrame();
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::Text("Pitch: %.1f", *m_scene->getPlayer().getTransform().getPitchAngle());
+			ImGui::Text("Yaw: %.1f", *m_scene->getPlayer().getTransform().getYawAngle());
+			glm::vec3& front = m_scene->getPlayer().getTransform().getFront();
+			ImGui::Text("Front: [%.1f,%.1f,%.1f]", front.x, front.y, front.z);
+
 			//ImGui::Text("Draw Time: %.3f ms/frame (%.2f FPS)", m_frameTime / 1000000.0f, 1000000000.0f / m_frameTime);
 
 			//m_imGuiHandler->createFrameDataPlot(1000.0f / ImGui::GetIO().Framerate);
@@ -165,8 +170,8 @@ void Application::mainLoop()
 			auto currentTime = std::chrono::high_resolution_clock::now();
 			float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-			//ubo.model = glm::mat4(1);
-			ubo.model = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			ubo.model = glm::mat4(1);
+			//ubo.model = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 			//ubo.view = glm::lookAt(glm::vec3(-2.0f, -2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 			//ubo.proj = glm::perspective(glm::radians(45.0f), m_renderer->getSwapchain().getExtent().width / (float)m_renderer->getSwapchain().getExtent().height, 0.1f, 10.0f);
 			ubo.view = m_scene->getMainCamera().getViewMatrix();

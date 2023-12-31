@@ -26,7 +26,7 @@ void Scene::update(float deltaTime)
 {
 	// Updates player translation and rotation based on mouse input and key input
 	m_entityController->update(deltaTime);
-	m_camera->updateTransformFromTarget();
+	m_camera->updateTransformFromTarget(); 
 	// Updates external factors upon player like health, damage, animation etc...
 	//m_player->update();
 	// Updates the camera. Since the camera has a reference to the entity its tracking (The player) 

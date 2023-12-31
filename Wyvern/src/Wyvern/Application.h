@@ -58,7 +58,7 @@ private:
     bool m_running = true;
     inline static Application* s_Instance;
 
-    //long long m_frameTime;
+    long long m_frameTime;
     void mainLoop();
 };
 

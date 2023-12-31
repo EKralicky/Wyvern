@@ -125,7 +125,7 @@ void WYVKGraphicsPipeline::initializeDefaultPipelineInfo()
     if (!m_usingDynamicStates) {
         m_configInfo.viewport.x = 0.0f;
         m_configInfo.viewport.y = 0.0f;
-        m_configInfo.viewport.width = (float)m_swapchain.getExtent().width;
+        m_configInfo.viewport.width = (float) m_swapchain.getExtent().width;
         m_configInfo.viewport.height = (float)m_swapchain.getExtent().height;
         m_configInfo.viewport.minDepth = 0.0f;
         m_configInfo.viewport.maxDepth = 1.0f;

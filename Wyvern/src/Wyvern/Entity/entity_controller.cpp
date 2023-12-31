@@ -20,16 +20,16 @@ void EntityController::update(float deltaTime)
 	double cursorY;
 
 	if (Input::isKeyPressed(WYVERN_KEY_W)) {
-		movementVector.x += 1.0f;
-	}
-	if (Input::isKeyPressed(WYVERN_KEY_S)) {
-		movementVector.x -= 1.0f;
-	}
-	if (Input::isKeyPressed(WYVERN_KEY_A)) {
 		movementVector.z += 1.0f;
 	}
-	if (Input::isKeyPressed(WYVERN_KEY_D)) {
+	if (Input::isKeyPressed(WYVERN_KEY_S)) {
 		movementVector.z -= 1.0f;
+	}
+	if (Input::isKeyPressed(WYVERN_KEY_A)) {
+		movementVector.x += 1.0f;
+	}
+	if (Input::isKeyPressed(WYVERN_KEY_D)) {
+		movementVector.x -= 1.0f;
 	}
 	if (Input::isKeyPressed(WYVERN_KEY_SPACE)) {
 		movementVector.y -= 1.0f; // Using negative her because vulkan uses a coordinate system where the y coordinate goes down
@@ -39,6 +39,13 @@ void EntityController::update(float deltaTime)
 	}
 	//WYVERN_LOG_INFO(movementVector.x);
 	glfwGetCursorPos(Application::get()->getWindow().getNativeWindow(), &cursorX, &cursorY);
+
+	if (m_firstMouse) {
+		m_lastCursorX = cursorX;
+		m_lastCursorY = cursorY;
+		m_firstMouse = false;
+	}
+
 	float deltaCursorX = static_cast<float>(cursorX - m_lastCursorX);
 	float deltaCursorY = static_cast<float>(cursorY - m_lastCursorY);
 	m_lastCursorX = cursorX;

@@ -24,7 +24,7 @@ private:
 
 	double m_lastCursorX = 0.0f;
 	double m_lastCursorY = 0.0f;
-
+	bool m_firstMouse = true;
 	/*
 	* The sensitivity should be an attribute of the controller and not the camera.
 	* This makes sense because sensitivity is not inherently an attribute of a camera. 
@@ -33,7 +33,7 @@ private:
 	*
 	* Think of it like a person holding a camera. Does the camera control how fast the person moves it?
 	*/
-	float m_sensitivity = 0.001f;
+	float m_sensitivity = 0.1f;
 };
 
 }

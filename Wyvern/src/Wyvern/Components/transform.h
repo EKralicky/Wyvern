@@ -8,7 +8,7 @@ namespace Wyvern {
 class Transform 
 {
 public:
-	Transform(glm::vec3 position = { 0.0f, 0.0f, 0.0f });
+	Transform(glm::vec3 position = { 0.0f, 1.0f, -1.0f });
 
 	/*
 	* Returns a view matrix based on the rotation and position of the transform
@@ -27,7 +27,9 @@ public:
 	*/
 	void updatePosition(glm::vec3& relativeVelocity);
 
-	void setPosition(glm::vec3& position);
+	void setPosition(glm::vec3 position);
+
+	void setLockPitch(bool value) { m_lockPitch = value; }
 
 	void setValues(glm::vec3 position, glm::quat orientation, glm::vec3 front)
 	{
@@ -38,7 +40,9 @@ public:
 
 	glm::vec3 getPosition() { return m_position; }
 	glm::quat getOrientation() { return m_orientation; }
-	glm::vec3 getFront() { return m_front; }
+	glm::vec3& getFront() { return m_front; }
+	float* getPitchAngle() { return &m_pitchAngle; }
+	float* getYawAngle() { return &m_yawAngle; }
 
 private:
 	glm::quat m_orientation;
@@ -48,6 +52,10 @@ private:
 
 	float m_pitchAngle = 0.0f; // vertical (up and down)
 	float m_yawAngle = 0.0f; // horizontal (left and right)
+
+	bool m_lockPitch = true; // Restricts the pitch to 90 degrees in both directions
+
+	void updateQuatOrientation();
 };
 
 }

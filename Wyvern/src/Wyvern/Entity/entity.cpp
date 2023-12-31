@@ -7,7 +7,7 @@ namespace Wyvern {
 		:m_transform(std::make_unique<Transform>()),
 		m_baseMovementSpeed(1.0f)
 	{
-		m_transform->setPosition(position);
+		m_transform->setPosition({ 0.0f, 0.0f, -2.0f });
 	}
 
 	Entity::~Entity()
