@@ -55,12 +55,12 @@ void Transform::updateQuatOrientation()
 	m_front = glm::rotate(m_orientation, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
-void Transform::updatePosition(glm::vec3& relativeVelocity)
+void Transform::updatePosition(glm::vec3& relativeVelocity, float scale)
 {
 	glm::vec3 left = glm::cross(m_front, m_worldUp);
-	m_position += relativeVelocity.x * left * 0.01f;
-	m_position += relativeVelocity.y * m_worldUp * 0.01f;
-	m_position += relativeVelocity.z * m_front * 0.01f;
+	m_position += relativeVelocity.x * left * scale;
+	m_position += relativeVelocity.y * m_worldUp * scale;
+	m_position += relativeVelocity.z * m_front * scale;
 }
 
 void Transform::setPosition(glm::vec3 position)

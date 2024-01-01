@@ -10,6 +10,12 @@ EntityController::EntityController(Entity* pawn)
 {
 }
 
+EntityController::EntityController()
+	:m_pawn(nullptr),
+	m_movementVector({ 0.0f, 0.0f, 0.0f })
+{
+}
+
 void EntityController::update(float deltaTime)
 {
 	glm::vec3 movementVector = { 0.0f, 0.0f, 0.0f };
@@ -50,7 +56,7 @@ void EntityController::update(float deltaTime)
 
 	// Update entity transform vectors based on mouse position before moving relative
 	m_pawn->getTransform().updateOrientation(deltaCursorY, deltaCursorX, m_sensitivity);
-	m_pawn->getTransform().updatePosition(movementVector);
+	m_pawn->getTransform().updatePosition(movementVector, m_pawn->getBaseMovementSpeed());
 }
 
 }

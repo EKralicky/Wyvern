@@ -17,6 +17,8 @@ public:
 	*/
 	void setBaseMovementSpeed(float speed) { m_baseMovementSpeed = speed; }
 
+	float getBaseMovementSpeed() { return m_baseMovementSpeed; }
+
 	/*
 	* Returns the entities transform
 	*/

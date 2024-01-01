@@ -9,6 +9,7 @@ class EntityController
 {
 public:
 	EntityController(Entity* pawn);
+	EntityController();
 
 	void update(float deltaTime);
 	void setPawn(Entity* pawn) { m_pawn = pawn; }

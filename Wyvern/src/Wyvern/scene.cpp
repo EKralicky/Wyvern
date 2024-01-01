@@ -10,8 +10,8 @@ Scene::Scene()
 
 void Scene::initScene()
 {
+	m_player = std::make_unique<Player>(glm::vec3(0.0f, 0.0f, 0.0f));
 	m_entityController = std::make_unique<EntityController>();
-	m_player = std::make_unique<Player>();
 	m_camera = std::make_unique<PerspectiveCamera>();
 
 	m_entityController->setPawn(m_player.get());
