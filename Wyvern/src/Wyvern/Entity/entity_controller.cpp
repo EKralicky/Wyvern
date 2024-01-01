@@ -4,13 +4,10 @@
 
 namespace Wyvern {
 
-EntityController::EntityController()
+EntityController::EntityController(Entity* pawn)
+	:m_pawn(pawn),
+	m_movementVector({0.0f, 0.0f, 0.0f})
 {
-}
-
-EntityController::~EntityController()
-{
-
 }
 
 void EntityController::update(float deltaTime)

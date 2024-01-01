@@ -3,12 +3,10 @@
 
 namespace Wyvern {
 
-	Player::Player()
+	Player::Player(glm::vec3 position)
+		:Entity(position)
 	{
 	}
 
-	Player::~Player()
-	{
-	}
 }
 

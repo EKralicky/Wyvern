@@ -8,10 +8,6 @@ Scene::Scene()
 
 }
 
-Scene::~Scene()
-{
-}
-
 void Scene::initScene()
 {
 	m_entityController = std::make_unique<EntityController>();

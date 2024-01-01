@@ -8,8 +8,11 @@ class Scene
 {
 public:
 	Scene();
-	~Scene();
 
+	/*
+	* Creates entity controller, player, camera, and binds the player to
+	* the camera and the camera controller
+	*/
 	void initScene();
 	void update(float deltaTime);
 
@@ -20,6 +23,7 @@ private:
 	std::unique_ptr<EntityController> m_entityController;
 	std::unique_ptr<Player> m_player;
 	std::unique_ptr<PerspectiveCamera> m_camera;
+
 };
 
 }

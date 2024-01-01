@@ -28,11 +28,11 @@ void Transform::updateOrientation(float deltaPitch, float deltaYaw, float scale)
 	m_yawAngle += deltaYaw;
 
 	if (m_lockPitch) {
-		if (m_pitchAngle > 89.9f) {
-			m_pitchAngle = 89.9f;
+		if (m_pitchAngle > 90.0f) {
+			m_pitchAngle = 90.0f;
 		}
-		else if (m_pitchAngle < -89.9f) {
-			m_pitchAngle = -89.9f;
+		else if (m_pitchAngle < -90.0f) {
+			m_pitchAngle = -90.0f;
 		}
 	}
 
@@ -57,7 +57,6 @@ void Transform::updateQuatOrientation()
 
 void Transform::updatePosition(glm::vec3& relativeVelocity)
 {
-	//WYVERN_LOG_INFO(relativeVelocity.x);
 	glm::vec3 left = glm::cross(m_front, m_worldUp);
 	m_position += relativeVelocity.x * left * 0.01f;
 	m_position += relativeVelocity.y * m_worldUp * 0.01f;

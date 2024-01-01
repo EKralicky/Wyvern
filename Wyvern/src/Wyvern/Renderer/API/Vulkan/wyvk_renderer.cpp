@@ -178,7 +178,8 @@ void WYVKRenderer::setupGraphicsPipeline(uint32_t currentFrame)
     /*
     * Adjust viewport origin for flipping.
     * Otherwise setting the height to -1 will flip the viewport around 0,0 (top left)
-    * and our image will be displayed off screen
+    * and our image will be displayed off screen. We just need to offset it before hand and it will flip right
+    * into place :)
     * [https://stackoverflow.com/questions/45570326/flipping-the-viewport-in-vulkan]
     */
     viewport.y += abs(viewport.height);

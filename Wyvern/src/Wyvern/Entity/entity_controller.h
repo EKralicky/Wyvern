@@ -8,18 +8,14 @@ namespace Wyvern {
 class EntityController
 {
 public:
-	EntityController();
-	~EntityController();
+	EntityController(Entity* pawn);
 
-	void setPawn(Entity* pawn) { m_pawn = pawn;  }
-	void setCamera(PerspectiveCamera* camera) { m_camera = camera; }
 	void update(float deltaTime);
-
+	void setPawn(Entity* pawn) { m_pawn = pawn; }
 	float getSensitivity() { return m_sensitivity; }
 
 private:
 	Entity* m_pawn;
-	PerspectiveCamera* m_camera;
 	glm::vec3 m_movementVector;
 
 	double m_lastCursorX = 0.0f;

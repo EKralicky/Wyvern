@@ -47,7 +47,7 @@ public:
     static const int MAX_FRAMES_IN_FLIGHT = 2;
 
     const std::array<VkClearValue, 2> clearValues = { {
-        {0.0f, 0.0f, 0.0f, 1.0f}, // Clear value for color attachment (red, green, blue, alpha)
+        {0.729f, 0.988f, 1.0f, 1.0f}, // Clear value for color attachment (red, green, blue, alpha)
         {1.0f, 0}                // Clear value for depth-stencil attachment. First param is far plane distance
     } };
 

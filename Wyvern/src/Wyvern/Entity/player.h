@@ -6,8 +6,7 @@ namespace Wyvern {
 class Player : public Entity {
 
 public:
-	Player();
-	~Player();
+	Player(glm::vec3 position);
 
 private:
 

@@ -7,18 +7,9 @@ class Entity {
 	
 public:
 	Entity(glm::vec3 position = { 0.0f, 0.0f, 0.0f });
-	~Entity();
-
 	/*
 	*/
 	void update();
-
-	/*
-	* Moves the entity relative to where they are facing.
-	* e.g. if the movementVector is (1, 0, -1), the entity will move 1 unit "forward" and 1 movement to the left
-	* relative to where the entity is facing
-	*/
-	void moveRelative(glm::vec3 movementVector, float deltaTime);
 
 	/*
 	* Sets the entities base movement speed.
