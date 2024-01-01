@@ -10,9 +10,9 @@ Wyvern aims to be a real-time voxel raytracing engine (Currently only supports r
 - [x] Runtime shader compilation (shaderc)
 - [x] ImGui debugging
 - [x] Polling input system using GLFW
-- [ ] Player movement
-  - [ ]  Player & Player controller
-  - [ ]  3D Perspective Camera
+- [x] Player movement
+  - [x]  Player & Player controller
+  - [x]  3D Perspective Camera
 - [ ] Phong lighting
 - [ ] Efficient voxel acceleration structures for raytracing
 - [ ] Raytraced rendering with shadows
