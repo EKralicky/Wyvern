@@ -17,6 +17,7 @@ Window::Window(const char* title)
 
     glfwSetWindowUserPointer(m_nativeWindow, &m_windowData);
 	glfwSetFramebufferSizeCallback(m_nativeWindow, Window::framebufferResizeCallback);
+    glfwSetInputMode(m_nativeWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 Window::~Window()

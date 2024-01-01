@@ -125,7 +125,7 @@ void WYVKGraphicsPipeline::initializeDefaultPipelineInfo()
     if (!m_usingDynamicStates) {
         m_configInfo.viewport.x = 0.0f;
         m_configInfo.viewport.y = 0.0f;
-        m_configInfo.viewport.width = (float)m_swapchain.getExtent().width;
+        m_configInfo.viewport.width = (float) m_swapchain.getExtent().width;
         m_configInfo.viewport.height = (float)m_swapchain.getExtent().height;
         m_configInfo.viewport.minDepth = 0.0f;
         m_configInfo.viewport.maxDepth = 1.0f;
@@ -142,7 +142,7 @@ void WYVKGraphicsPipeline::initializeDefaultPipelineInfo()
     // culls back face geomtry. The orientation of the geometry is specified in the following parameter
     m_configInfo.rasterizationInfo.cullMode = VK_CULL_MODE_BACK_BIT;
     // Specifies the orientation of vertices to NOT cull. So "front" facing geometry with clockwise vertices will be shown, 
-    // while "back" facking geometry with counter-clockwise vertices will be culled
+    // while "back" facing geometry with counter-clockwise vertices will be culled
     m_configInfo.rasterizationInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
     m_configInfo.rasterizationInfo.depthBiasEnable = VK_FALSE;
     m_configInfo.rasterizationInfo.depthBiasConstantFactor = 0.0f; // Optional

@@ -3,13 +3,10 @@
 
 namespace Wyvern {
 
-class Player : Entity {
+class Player : public Entity {
 
 public:
-	Player();
-	~Player();
-
-	void jump();
+	Player(glm::vec3 position);
 
 private:
 

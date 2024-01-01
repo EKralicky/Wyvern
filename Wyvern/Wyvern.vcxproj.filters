@@ -21,9 +21,6 @@
     <ClCompile Include="src\Wyvern\logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vk_utility\WYVK.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -129,11 +126,20 @@
     <ClCompile Include="src\Wyvern\Entity\entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Wyvern\Entity\entity_controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Camera\perspective_camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wyvern\Components\transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\vk_utility\WYVK.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Wyvern\application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -254,9 +260,6 @@
     <ClInclude Include="src\Wyvern\Input\keycodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Wyvern\Camera\camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Wyvern\Entity\player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -279,6 +282,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Wyvern\Input\input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Entity\entity_controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Camera\perspective_camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\Components\transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wyvern\scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

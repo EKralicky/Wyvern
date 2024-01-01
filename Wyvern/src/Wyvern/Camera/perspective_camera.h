@@ -1,26 +1,32 @@
 #pragma once
 #include "Wyvern/core.h"
+#include "Wyvern/Components/transform.h"
+#include "Wyvern/Entity/entity.h"
 
 namespace Wyvern {
 
-	class PerspectiveCamera
-	{
-	public:
-		PerspectiveCamera();
+class PerspectiveCamera
+{
+public:
+	PerspectiveCamera();
 
+	void update();
 
-		inline void setPosition(glm::vec3 pos) { m_position = pos; };
-		inline const glm::vec3& getPosition() const { return m_position; }
+	void setTarget(Entity* target) { m_target = target; }
+	Entity* getTarget() { return m_target; }
+	glm::mat4 getViewMatrix();
+	glm::mat4 getProjectionMatrix();
 
+	void updateTransformFromTarget();
+	Transform& getTransform() { return *m_transform; }
 
-		void updateMatrices();
-
-	private:
-		glm::vec3 m_position;
-
-		glm::mat4 m_viewMatrix;
-		glm::mat4 m_projectionMatrix;
-		glm::mat4 m_viewProjectionMatrix;
-	};
+private:
+	std::unique_ptr<Transform> m_transform;
+	glm::mat4 m_projectionMatrix;
+	Entity* m_target = nullptr;
+	
+	float m_targetDistance = 0.0f;
+};
 
 }
+   

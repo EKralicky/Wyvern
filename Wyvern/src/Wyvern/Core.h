@@ -13,10 +13,24 @@
 #include <chrono>
 #include <stdexcept> 
 
-// GLM for math
+/*
+* So even though were using Vulkan which uses a right-handed NDC (Normalized device coordinate) space,
+* we have to use GLM_FORCE_LEFT_HANDED because GLM does an implicit handedness swap due to how
+* OpenGL handles handedness:
+* 
+* "While OpenGL NDC space was “left-handed,” all of the OpenGL matrix functions created right-handed matrices. That is, 
+* model space and camera space were created as right-handed. This also means that the OpenGL functions that produce
+* camera-to-clip-space transformations (glFrustum, glOrtho and the like) must perform a handedness swap to match OpenGL’s “left-handed” clip-space."
+* [https://community.khronos.org/t/confused-when-using-glm-for-projection/108548]
+*/
+#define GLM_FORCE_LEFT_HANDED
 #define GLM_FORCE_RADIANS
+//#define GLM_FORCE_MESSAGES
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 // IMGUI
 #include "imgui/imgui.h"

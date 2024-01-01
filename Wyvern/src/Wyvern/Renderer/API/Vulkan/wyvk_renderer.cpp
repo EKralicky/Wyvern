@@ -171,9 +171,19 @@ void WYVKRenderer::setupGraphicsPipeline(uint32_t currentFrame)
     viewport.x = 0.0f;
     viewport.y = 0.0f;
     viewport.width = static_cast<float>(extent.width);
-    viewport.height = static_cast<float>(extent.height);
+    viewport.height = -static_cast<float>(extent.height);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
+
+    /*
+    * Adjust viewport origin for flipping.
+    * Otherwise setting the height to -1 will flip the viewport around 0,0 (top left)
+    * and our image will be displayed off screen. We just need to offset it before hand and it will flip right
+    * into place :)
+    * [https://stackoverflow.com/questions/45570326/flipping-the-viewport-in-vulkan]
+    */
+    viewport.y += abs(viewport.height);
+
     vkCmdSetViewport(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), 0, 1, &viewport);
 
     // Set dynamic scissor

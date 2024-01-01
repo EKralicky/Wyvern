@@ -163,10 +163,12 @@
     <ClCompile Include="src\vendor\implot\implot.cpp" />
     <ClCompile Include="src\vendor\implot\implot_demo.cpp" />
     <ClCompile Include="src\vendor\implot\implot_items.cpp" />
-    <ClCompile Include="src\vk_utility\WYVK.cpp" />
     <ClCompile Include="src\Wyvern\application.cpp" />
+    <ClCompile Include="src\Wyvern\Camera\perspective_camera.cpp" />
+    <ClCompile Include="src\Wyvern\Components\transform.cpp" />
     <ClCompile Include="src\Wyvern\Entity\entity.cpp" />
     <ClCompile Include="src\Wyvern\Entity\player.cpp" />
+    <ClCompile Include="src\Wyvern\Entity\entity_controller.cpp" />
     <ClCompile Include="src\Wyvern\GUI\imguihandler.cpp" />
     <ClCompile Include="src\Wyvern\logger.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\Command\wyvk_commandbuffer.cpp" />
@@ -188,6 +190,7 @@
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_surface.cpp" />
     <ClCompile Include="src\Wyvern\Renderer\API\Vulkan\wyvk_swapchain.cpp" />
+    <ClCompile Include="src\Wyvern\scene.cpp" />
     <ClCompile Include="src\Wyvern\window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -205,12 +208,13 @@
     <ClInclude Include="src\vendor\imgui\misc\single_file\imgui_single_file.h" />
     <ClInclude Include="src\vendor\implot\implot.h" />
     <ClInclude Include="src\vendor\implot\implot_internal.h" />
-    <ClInclude Include="src\vk_utility\WYVK.h" />
     <ClInclude Include="src\Wyvern\application.h" />
-    <ClInclude Include="src\Wyvern\Camera\camera.h" />
+    <ClInclude Include="src\Wyvern\Camera\perspective_camera.h" />
+    <ClInclude Include="src\Wyvern\Components\transform.h" />
     <ClInclude Include="src\Wyvern\core.h" />
     <ClInclude Include="src\Wyvern\Entity\entity.h" />
     <ClInclude Include="src\Wyvern\Entity\player.h" />
+    <ClInclude Include="src\Wyvern\Entity\entity_controller.h" />
     <ClInclude Include="src\Wyvern\Events\application_event.h" />
     <ClInclude Include="src\Wyvern\Events\event.h" />
     <ClInclude Include="src\Wyvern\Events\key_event.h" />
@@ -239,6 +243,7 @@
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_renderer.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_surface.h" />
     <ClInclude Include="src\Wyvern\Renderer\API\Vulkan\wyvk_swapchain.h" />
+    <ClInclude Include="src\Wyvern\scene.h" />
     <ClInclude Include="src\Wyvern\utility.h" />
     <ClInclude Include="src\Wyvern\window.h" />
   </ItemGroup>
