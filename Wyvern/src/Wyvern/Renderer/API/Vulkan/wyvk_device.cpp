@@ -50,15 +50,13 @@ void WYVKDevice::createPhysicalDevice() {
 // We essentially need to sync them up so they are the same
 void WYVKDevice::createLogicalDevice() {
     m_queueFamilyIndices = findQueueFamilies(m_physicalDevice);
-    VkPhysicalDeviceFeatures deviceFeatures{};
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = { 
-        m_queueFamilyIndices.graphicsFamily.value(), 
+    std::set<uint32_t> uniqueQueueFamilies = {
+        m_queueFamilyIndices.graphicsFamily.value(),
         m_queueFamilyIndices.presentFamily.value(),
         m_queueFamilyIndices.computeFamily.value()
     };
-
     // Create queue info's for all queue families in uniqueQueueFamilies
     // Some queue families may have the same index which is ok.
     float queuePriority = 1.0f;
@@ -71,8 +69,20 @@ void WYVKDevice::createLogicalDevice() {
         queueCreateInfos.push_back(deviceQueueInfo);
     }
 
+    VkPhysicalDeviceFeatures deviceFeatures{};
+
+    VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingFeatures{};
+    rayTracingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+    rayTracingFeatures.pNext = nullptr;
+    rayTracingFeatures.rayTracingPipeline = true;
+
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
+    accelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+    accelerationStructureFeatures.pNext = &rayTracingFeatures;
+
     VkDeviceCreateInfo deviceCreateInfo{};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pNext = &accelerationStructureFeatures;
     deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
     deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
     deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
