@@ -67,6 +67,14 @@ public:
     void initRenderAPI();
 
     /*
+    * TODO:
+    * Queries raytracing capabilities of the selected GPU and the shader header size. This will specifically query the maximum recursion depth, which
+    * is the number of nested ray calls that can be performed from a single ray. i.e. The number of times a ray can bounce in
+    * the scene.
+    */
+    void initRaytracing();
+
+    /*
     * Waits for previous frame to finish via fences & prepares the next swapchain image for rendering.
     * This function returns a boolean value indicating whether the swapchain needs to be recreated. If the swapchain needs to
     * be recreated, this function will return false.
@@ -245,21 +253,25 @@ private:
 
     void createRenderFrameContexts();
 
+    /*
+    * MUST be performed before running createRenderFrameContexts()
+    * createRenderFrameContexts creates descriptors adn their bindings inside of the renderFrameContexts\
+    * so the descriptor sets must be initialized beforehand.
+    */
+    void createDescriptorSets();
+
     std::unique_ptr<WYVKInstance> m_instance;
     std::unique_ptr<WYVKDevice> m_device;
     std::unique_ptr<WYVKSurface> m_surface;
     std::unique_ptr<WYVKSwapchain> m_swapchain;
     std::unique_ptr<WYVKRenderPass> m_renderPass; // might need multiple render passes and pipelines later on
     std::unique_ptr<WYVKGraphicsPipeline> m_graphicsPipeline;
-
     std::unique_ptr<WYVKCommandPool> m_commandPool;
-    //std::vector<std::unique_ptr<WYVKCommandBuffer>> m_commandBuffers;
 
-    //std::vector<VkSemaphore> m_imageAvailableSemaphores;
-    //std::vector<VkSemaphore> m_renderFinishedSemaphores;
+    // RT
+    VkPhysicalDeviceRayTracingPipelinePropertiesKHR m_rtProps;
 
-    //std::vector<VkFence> m_inFlightFences;
-
+    
     // Staging buffer used for vertex & index data transfer to appropriate buffers on GPU
     // Transfer fence to signal once transfer operations are complete
     std::unique_ptr<WYVKBuffer> m_stagingBuffer;
