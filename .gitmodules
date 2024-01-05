@@ -1,0 +1,6 @@
+[submodule "Wyvern/src/vendor/imgui"]
+	path = Wyvern/src/vendor/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "Wyvern/src/vendor/implot"]
+	path = Wyvern/src/vendor/implot
+	url = https://github.com/epezent/implot.git
