@@ -4,3 +4,9 @@
 [submodule "Wyvern/src/vendor/implot"]
 	path = Wyvern/src/vendor/implot
 	url = https://github.com/epezent/implot.git
+[submodule "Wyvern/src/vendor/glfw"]
+	path = Wyvern/src/vendor/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Wyvern/src/vendor/spdlog"]
+	path = Wyvern/src/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
