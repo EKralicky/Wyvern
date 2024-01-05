@@ -28,7 +28,6 @@ void Scene::update(float deltaTime)
 	// Updates the camera. Since the camera has a reference to the entity its tracking (The player) 
 	// it can update its Transformation according to the players transformation
 	//m_camera->update();
-	
 }
-
+ 
 }

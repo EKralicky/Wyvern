@@ -23,12 +23,19 @@ WYVKRenderer::WYVKRenderer(Window& window)
     m_renderPass->createRenderPass();
     m_renderPass->createFramebuffers();
 
-    // Create graphics pipeline & render frame contexts (which includes the descriptorsetlayout which is needed in the pipeline)
+    // Create graphics pipeline & render frame contexts (which includes the descriptorSetLayout which is needed in the pipeline)
+    createDescriptorSets();
     createRenderFrameContexts();
-
     m_graphicsPipeline = std::make_unique<WYVKGraphicsPipeline>(*m_device, *m_swapchain, *m_renderPass);
     m_graphicsPipeline->createGraphicsPipeline(m_descriptorSetLayout->getLayout());
 
+    /*
+    * RT
+    * For RTX 3070:
+    * Max recursion depth: 31
+    * Shader group handle size: 32
+    */
+    initRaytracing();
 
     m_commandPool = std::make_unique<WYVKCommandPool>(*m_device);   
     createCommandBuffers();
@@ -85,6 +92,16 @@ void WYVKRenderer::initRenderAPI()
         WYVERN_LOG_INFO("\t{}", extension.extensionName);
     }
     checkGLFWSupportedExtensions(extensions);
+}
+
+void WYVKRenderer::initRaytracing()
+{
+    m_rtProps.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+
+    VkPhysicalDeviceProperties2 props2;
+    props2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    props2.pNext = &m_rtProps;
+    vkGetPhysicalDeviceProperties2(m_device->getPhysicalDevice(), &props2);
 }
 
 
@@ -368,16 +385,19 @@ void WYVKRenderer::allocateStagingBuffer(VkDeviceSize size)
     m_stagingBuffer = std::make_unique<WYVKBuffer>(*m_device, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 }
 
-void WYVKRenderer::createRenderFrameContexts()
+void WYVKRenderer::createDescriptorSets()
 {
     // Create descriptor pool of 10 descriptors and a max of 10 sets
     m_descriptorPool = std::make_unique<WYVKDescriptorPool>(*m_device, 10, 10);
-    
+
     // Create descriptor layout bindings and actual layout object
     m_descriptorSetLayout = std::make_unique<WYVKDescriptorLayout>(*m_device);
     m_descriptorSetLayout->addBinding(0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
     m_descriptorSetLayout->createLayout();
+}
 
+void WYVKRenderer::createRenderFrameContexts()
+{
     m_frameContexts.resize(MAX_FRAMES_IN_FLIGHT + 1);
 
     for (FrameContext& context : m_frameContexts) {
