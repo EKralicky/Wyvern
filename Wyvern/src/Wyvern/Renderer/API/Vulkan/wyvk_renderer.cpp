@@ -101,7 +101,7 @@ void WYVKRenderer::initRaytracing()
     VkPhysicalDeviceProperties2 props2;
     props2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     props2.pNext = &m_rtProps;
-    vkGetPhysicalDeviceProperties2(m_device->getPhysicalDevice(), &props2);
+    //vkGetPhysicalDeviceProperties2(m_device->getPhysicalDevice(), &props2);
 }
 
 

@@ -43,19 +43,27 @@ if exist "./glfw/bin" (
 )
 
 REM install latest Vulkan SDK using the silent windows installer
-mkdir vulkanSDK
-echo Downloading Vulkan SDK %vulkanVersion%... (This may take a while)
-powershell -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest %vulkanUrl% -OutFile vulkanSDK-Installer.exe"
-echo Running vulkanSDK installer with root directory ./Wyvern/vendor/vulkanSDK
-vulkanSDK-Installer.exe --root %cd%/vulkanSDK --accept-licenses --default-answer --confirm-command install com.lunarg.vulkan.vma com.lunarg.vulkan.debug
+if exist "./vulkanSDK" (
+    echo vulkanSDK folder found! Assuming the Vulkan SDK is already installed - Skipping installation
+    echo If you need to reinstall the vulkanSDK, delete the vulkanSDK folder and re-run build.bat
+    goto :premake
+) else (
+    mkdir vulkanSDK
+    echo Downloading Vulkan SDK %vulkanVersion%... (This may take a while)
+    powershell -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest %vulkanUrl% -OutFile vulkanSDK-Installer.exe"
+    echo Running vulkanSDK installer with root directory ./Wyvern/vendor/vulkanSDK
+    vulkanSDK-Installer.exe --root %cd%/vulkanSDK --accept-licenses --default-answer --confirm-command install com.lunarg.vulkan.vma com.lunarg.vulkan.debug
 
-REM VULKAN cleanup
-del /f /q "vulkanSDK-Installer.exe"
+    REM VULKAN cleanup
+    del /f /q "vulkanSDK-Installer.exe"
+)
 
+:premake
 REM run premake
 echo Running premake for %1
 cd .. && cd ..
 echo Building project files
+.\premake\premake5.exe %1
 
 REM program exit
 exit /b

@@ -42,3 +42,5 @@ Generated\ Files/
 *.pidb
 *.svclog
 *.scc
+/Wyvern.sln
+/Wyvern/Wyvern.vcxproj.filters

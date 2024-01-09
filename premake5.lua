@@ -1,4 +1,4 @@
-workspace "Workspace"
+workspace "Wyvern"
 
     architecture "x64"
 
