@@ -1,0 +1,15 @@
+[submodule "Wyvern/vendor/glfw"]
+	path = Wyvern/vendor/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Wyvern/vendor/glm"]
+	path = Wyvern/vendor/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "Wyvern/vendor/imgui"]
+	path = Wyvern/vendor/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "Wyvern/vendor/implot"]
+	path = Wyvern/vendor/implot
+	url = https://github.com/epezent/implot.git
+[submodule "Wyvern/vendor/spdlog"]
+	path = Wyvern/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git

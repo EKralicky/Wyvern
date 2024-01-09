@@ -57,13 +57,13 @@ namespace Wyvern {
 		setDocking();
 
 		m_renderer.immediateSubmit([&](VkCommandBuffer cmd) {
-			ImGui_ImplVulkan_CreateFontsTexture(cmd);
+			ImGui_ImplVulkan_CreateFontsTexture();
 		});
 	}
 
 	ImGuiHandler::~ImGuiHandler()
 	{
-		ImGui_ImplVulkan_DestroyFontUploadObjects();
+		//ImGui_ImplVulkan_DestroyFontUploadObjects();
 		vkDestroyDescriptorPool(m_renderer.getDevice().getLogicalDevice(), m_imguiPool, nullptr);
 
 		ImGui_ImplGlfw_Shutdown();

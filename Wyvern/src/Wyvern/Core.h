@@ -33,12 +33,12 @@
 #include <glm/gtx/string_cast.hpp>
 
 // IMGUI
-#include "imgui/imgui.h"
-#include "imgui/backends/imgui_impl_glfw.h"
-#include "imgui/backends/imgui_impl_vulkan.h"
+#include "../vendor/imgui/imgui.h"
+#include "../vendor/imgui/backends/imgui_impl_glfw.h"
+#include "../vendor/imgui/backends/imgui_impl_vulkan.h"
 
 // IMPLOT widgets for ImGui Plotting
-#include "implot/implot.h"
+#include "../vendor/implot/implot.h"
 
 // Logging using spdlog
 #include "Wyvern/logger.h"
