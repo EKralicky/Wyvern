@@ -1,35 +1,27 @@
 workspace "Workspace"
+
     architecture "x64"
+
     configurations {
         "Debug",
         "Release"
     }
+
     startproject "Wyvern"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+ 
+include "Wyvern"
 
-project "Wyvern"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++17"
-
-    targetdir("bin" .. outputdir .. "/%{prj.name}")
-    objdir("bin-int" .. outputdir .. "/%{prj.name}")
-
-    files {
-        "%{prj.name}/src/**.cpp",
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.hpp"
-    }
-
-    filter { "configurations:Debug" }
-        defines { "DEBUG" }
-        buildoptions "/MTd"
-        runtime "Debug"
-        symbols "On"
-
-    filter { "configurations:Release" }
-        defines { "NDEBUG" }
-        buildoptions "/MT"
-        runtime "Release"
-        optimize "On"
+if _ACTION == 'clean' then
+    print("Cleaning solution")
+    os.rmdir('bin')
+    os.rmdir('bin-int')
+    os.rmdir('obj')
+    print("Removed binaries and obj files")
+    os.remove('*.sln')
+    print("Removed solution files")
+    os.remove('Wyvern/*.vcxproj')
+    os.remove('Wyvern/*.vcxproj.filters')
+    print("Removed project files (does not remove vcxproj.user)")
+ end
