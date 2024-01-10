@@ -29,6 +29,9 @@ WYVKRenderer::WYVKRenderer(Window& window)
     m_graphicsPipeline = std::make_unique<WYVKGraphicsPipeline>(*m_device, *m_swapchain, *m_renderPass);
     m_graphicsPipeline->createGraphicsPipeline(m_descriptorSetLayout->getLayout());
 
+    m_commandPool = std::make_unique<WYVKCommandPool>(*m_device);   
+    createCommandBuffers();
+
     /*
     * RT
     * For RTX 3070:
@@ -36,9 +39,6 @@ WYVKRenderer::WYVKRenderer(Window& window)
     * Shader group handle size: 32
     */
     initRaytracing();
-
-    m_commandPool = std::make_unique<WYVKCommandPool>(*m_device);   
-    createCommandBuffers();
 
     // Create fence for transfer operations
     VkFenceCreateInfo fenceInfo{};
@@ -97,11 +97,15 @@ void WYVKRenderer::initRenderAPI()
 void WYVKRenderer::initRaytracing()
 {
     m_rtProps.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+    m_rtProps.pNext = nullptr;
 
     VkPhysicalDeviceProperties2 props2;
     props2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     props2.pNext = &m_rtProps;
-    //vkGetPhysicalDeviceProperties2(m_device->getPhysicalDevice(), &props2);
+    props2.pNext = nullptr;
+
+    VkPhysicalDevice dev = m_device->getPhysicalDevice();
+    vkGetPhysicalDeviceProperties2(dev, &props2);
 }
 
 
