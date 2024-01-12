@@ -7,7 +7,6 @@
 #include "Core.h"
 #include "window.h"
 #include "Wyvern/Renderer/API/Vulkan/wyvk_renderer.h"
-#include "Renderer/API/Vulkan/Geometry/Model.h"
 #include "Wyvern/GUI/imguihandler.h"
 #include "Wyvern/Events/event.h"
 
@@ -53,6 +52,7 @@ private:
     std::unique_ptr<WYVKRenderer> m_renderer;
     std::unique_ptr<ImGuiHandler> m_imGuiHandler;
     std::unique_ptr<Scene> m_scene;
+    std::unique_ptr<ResourceAllocator> m_allocator;
 
     // Is the application running? Will be set to false on windowCloseEvent
     bool m_running = true;

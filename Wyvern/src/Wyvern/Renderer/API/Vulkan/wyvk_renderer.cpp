@@ -1,6 +1,10 @@
 #include "wyvk_renderer.h"
 #include "Descriptor/wyvk_descriptorlayout.h"
 
+#define VMA_IMPLEMENTATION
+#define VMA_VULKAN_VERSION 1003000 // vULKAN 1.3
+#include "vma/vk_mem_alloc.h"
+
 namespace Wyvern {
 
 
@@ -9,7 +13,8 @@ WYVKRenderer::WYVKRenderer(Window& window)
     m_instance(std::make_unique<WYVKInstance>()),
     m_device(std::make_unique<WYVKDevice>(*m_instance)),
     m_surface(std::make_unique<WYVKSurface>(*m_instance, *m_device, window)),
-    m_swapchain(std::make_unique<WYVKSwapchain>(*m_instance, *m_device, *m_surface, window))
+    m_swapchain(std::make_unique<WYVKSwapchain>(*m_instance, *m_device, *m_surface, window)),
+    m_allocator(std::make_unique<ResourceAllocator>(*m_device, *m_instance))
     //m_descriptorSetLayout(WYVKDescriptorSetLayout(*m_device, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT))
 {
 
@@ -240,6 +245,11 @@ void WYVKRenderer::bindDescriptorSets(uint32_t currentFrame)
     vkCmdBindDescriptorSets(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline->getPipelineLayout(), 0, 1, ds, 0, nullptr);
 }
 
+auto WYVKRenderer::modelToBLASGeometry(const Model* model)
+{
+
+}
+
 void WYVKRenderer::bindPipeline(uint32_t currentFrame)
 {
     vkCmdBindPipeline(*m_frameContexts[currentFrame].commandBuffer->getCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline->getPipeline());
@@ -347,7 +357,7 @@ void WYVKRenderer::present(uint32_t currentFrame, uint32_t imageIndex)
     else if (result != VK_SUCCESS) {
         throw std::runtime_error("Failed to present swap chain image!");
     }
-}
+} 
 
 WYVKBuffer* WYVKRenderer::createVertexBuffer(void* data, const VkDeviceSize size)
 {

@@ -9,6 +9,7 @@
 #include "wyvk_instance.h"
 
 #include "Pipelines/wyvk_graphics_pipeline.h"
+#include "Raytracing/wyvk_acceleration_structure.h"
 
 #include "Command/wyvk_commandpool.h"
 #include "Command/wyvk_commandbuffer.h"
@@ -17,6 +18,8 @@
 #include "Descriptor/wyvk_descriptorset.h"
 
 #include "Memory/buffer.h"
+#include "Geometry/vertex_geometry.h"
+#include "Memory/resource_allocator.h"
 
 namespace Wyvern {
 
@@ -24,13 +27,15 @@ class WYVKRenderer
 {
 public:
 
-    struct CameraMVPBuffer {
+    struct CameraMVPBuffer
+    {
         glm::mat4 model;
         glm::mat4 view;
         glm::mat4 proj;
     };
 
-    struct FrameContext {
+    struct FrameContext 
+    {
         VkFence inFlightFence;                  // Flags once the commandBuffer has finished rendering the current frame
         VkSemaphore imageAvailableSemaphore;   // Flags when a valid image is gathered from the swapchain
         VkSemaphore renderFinishedSemaphore;   // Flags once the GPU finishes rendering the current frame
@@ -177,6 +182,11 @@ public:
     void bindIndexBuffer(uint32_t currentFrame, VkBuffer buffer, VkIndexType indexType);
 
     /*
+    * Creates a generic buffer using the Vulkan Memory Allocator (VMA)
+    */
+    VkBuffer* createBuffer(size_t allocSize, VkBufferUsageFlags flags, VmaMemoryUsage memUsage);
+
+    /*
     * Updates the data in the uniform buffers used in the rendering pipeline.
     * This function should be called whenever the data used by the shaders changes, such as when the camera moves.
     * size is in bytes.
@@ -185,13 +195,21 @@ public:
 
     void bindDescriptorSets(uint32_t currentFrame);
 
+    /*
+    * This is not in the acceleration structure file/class because
+    * it generates info needed to build the acceleration structure and
+    * does not generate the structure itself.
+    */
+    auto modelToBLASGeometry(const Model* model);
+
     // Getters & Setters
-    inline WYVKInstance& getInstance() { return *m_instance; }
-    inline WYVKDevice& getDevice() { return *m_device; }
-    inline WYVKSwapchain& getSwapchain() { return *m_swapchain; }
-    inline WYVKRenderPass& getRenderPass() { return *m_renderPass; }
-    inline FrameContext& getFrameContext(uint32_t currentFrame) { return m_frameContexts[currentFrame]; }
-    inline WYVKCommandPool& getCommandPool() { return *m_commandPool; }
+    WYVKInstance& getInstance() { return *m_instance; }
+    WYVKDevice& getDevice() { return *m_device; }
+    WYVKSwapchain& getSwapchain() { return *m_swapchain; }
+    WYVKRenderPass& getRenderPass() { return *m_renderPass; }
+    FrameContext& getFrameContext(uint32_t currentFrame) { return m_frameContexts[currentFrame]; }
+    WYVKCommandPool& getCommandPool() { return *m_commandPool; }
+    ResourceAllocator& getResourceAllocator() { return *m_allocator; }
 
 private:
 
@@ -267,10 +285,10 @@ private:
     std::unique_ptr<WYVKRenderPass> m_renderPass; // might need multiple render passes and pipelines later on
     std::unique_ptr<WYVKGraphicsPipeline> m_graphicsPipeline;
     std::unique_ptr<WYVKCommandPool> m_commandPool;
+    std::unique_ptr<ResourceAllocator> m_allocator;
 
     // RT
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR m_rtProps;
-
     
     // Staging buffer used for vertex & index data transfer to appropriate buffers on GPU
     // Transfer fence to signal once transfer operations are complete

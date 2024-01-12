@@ -1,5 +1,6 @@
 #pragma once
 #include "Wyvern/core.h"
+#include "Wyvern/Renderer/API/Vulkan/Memory/resource_allocator.h"
 
 namespace Wyvern {
 
@@ -47,6 +48,16 @@ struct Vertex
 
 		return attributeDescriptions;
 	}
+};
+
+struct Model
+{
+	ResourceAllocator::Buffer vertexBuffer;
+	ResourceAllocator::Buffer indexBuffer;
+	uint32_t vertexCount = 0;
+	uint32_t indexCount = 0;
+	size_t vertexSize = 0;
+	size_t indexSize = 0;
 };
 
 }
